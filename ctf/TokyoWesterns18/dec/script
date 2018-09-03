@@ -1,0 +1,16 @@
+file dec_dec_dec
+
+define hook-quit
+    set confirm off
+end
+
+set print address off
+
+break * 0x555555555109
+commands 1
+x/s $rdi
+x/s $rsi
+quit
+end
+
+r FLAG_HERE
