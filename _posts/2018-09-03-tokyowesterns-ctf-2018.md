@@ -16,6 +16,9 @@ I played this years TokyoWesterns CTF with team [HATS Singapore][ctftime] and we
 - [dec dec dec (rev)][dec] - Solves: 159, 99 pts
 - Welcome!! (warmup) - Solves: 799, 28 pts
 
+Additional writeup for Neighbour C which I solved after the CTF
+- [Neighbour C (pwn)][neighbour]
+
 ## Some thoughts
 
 This CTF was very fun for me as the difficulty of the challenges wasn't too extreme that I was pulling my hair out (since I was doing the lower point challenges), but they were definitely still challenging. Burnt my whole weekend on it though lol.
@@ -28,3 +31,4 @@ Also about playing with HATS. I initially joined HATS a few months ago after bei
 [load]:{{site.baseurl}}/2018-09-03/tokyowesterns-ctf-2018-load-pwn/
 [scs7]:{{site.baseurl}}/2018-09-03/tokyowesterns-ctf-2018-dec-dec-dec-rev-and-scs7-crypto/
 [dec]:{{site.baseurl}}/2018-09-03/tokyowesterns-ctf-2018-dec-dec-dec-rev-and-scs7-crypto/
+[neighbour]:{{site.baseurl}}/2018-09-04/tokyowesterns-ctf-2018-neighbour-c/
