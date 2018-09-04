@@ -56,8 +56,11 @@ Illustration -> * 1, 2 and 3 refer to the steps taken by the swap routine.
 ![paper][paper]
 
 What can we do with this? It seems quite useless at first look but I realised that it could allow us to write 1 arbitrary byte to memory. Here's how it works.
+
 1) First we have to find an address that contains a pointer which points to a valid address that does not get changed while we are running in main. For me I think I used this address on the stack `0x00007ffd188a9008│+0xb8: 0x00007ffd188a9078 (I will call this address A)  →  0x00007ffd188a9fd2  →  "LD_PRELOAD=./libc.so.6"`
+
 2) We must also realise that in the bss, there are large sections that are mapped and writable which are not changed during program execution. For me I used `0x601200 - 0x6012FF`. Do you notice something? We can control the least significant byte of this address, this will come useful later.
+
 3) Now lets do our arbitrary single byte write. If we want to write the byte `0x99`, the situation looks like this.
 ```
 0x0000000000601299 : 0x0
