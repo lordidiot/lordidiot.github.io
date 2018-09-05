@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "TokyoWesterns CTF 2018 - Neighbour C"
+title: "TokyoWesterns CTF 2018 - Neighbour C (pwn)"
 description: ""
 date: 2018-09-04
 tags: [ctf, pwn]
