@@ -39,9 +39,9 @@ _After seeing the flag, I felt quite stupid for not doing static analysis lol._
 
 # scs7
 > nc crypto.chal.ctf.westerns.tokyo 14791
-
+>
 > Note: You can encrypt up to 100 messages "per once connection". 
-
+>
 > [+solve.py][solve] (Solves: 134, 112 pts)
 
 When we connected to the service, we are greeted by some sort of encryption service again. This time it's actually a black-box encryption service :P.

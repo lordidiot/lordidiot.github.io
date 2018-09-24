@@ -8,9 +8,9 @@ comments: true
 ---
 
 > SWAP SAWP WASP PWAS SWPA 
-
+>
 > nc swap.chal.ctf.westerns.tokyo 37567 (Solves: 39, 233 pts)
-
+>
 > [swap][swap] [+exploit.py][exploit]
 
 This challenge is running a binary that provides three options, set, swap and exit.

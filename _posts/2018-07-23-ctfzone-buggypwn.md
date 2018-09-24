@@ -10,7 +10,7 @@ comments: true
 > A disgruntled employee has recently left our team. Unfortunately, he took a flag with him. We've discovered that there is strange buggy service currently in development on his server. Maybe you can get the flag from there.
 nc pwn-02.v7frkwrfyhsjtbpfcppnu.ctfz.one 1337
 (Solves: 31, 138pts)
-
+>
 > [buggy_pwn.py][buggypwn] [+exploit.py][exploit] [+disassembler.py][disassembler]
 
 This was a very interesting pwn challenge for me. I've never dared to try any challenge in the past with custom-ish architecture and I'm really happy I managed to solve this.

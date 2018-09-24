@@ -8,9 +8,9 @@ comments: true
 ---
 
 > host : pwn1.chal.ctf.westerns.tokyo
-
+>
 > port : 34835 (Solves: 49, 208 pts)
-
+>
 > [load][load] [+exploit.py][exploit]
 
 This challenge runs a binary that is a **Load file Service**, which allows you to read any file on the system, which it will open and write the file contents to a buffer on the stack. The `filename` that we enter is limited to 128-bytes and is placed in a variable in the bss section, we should take note of that. From this description, it is quite obvious that we are going for a stack-based buffer overflow which will allow us to control the saved RIP on the stack, as long as the file read is larger than the buffer size, it will overflow. 

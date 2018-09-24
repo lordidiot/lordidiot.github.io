@@ -9,7 +9,7 @@ comments: true
 
 > nc pwn01.grandprix.whitehatvn.com 26129
 (Solves: 34, 160pts)
-
+>
 > [giftshop][giftshop] [+exploit.py][exploit]
 
 This challenge provides a binary and a ptrace program that runs alongside the challenge binary. The intention of the ptrace program is to monitor the child challenge binary to block certain syscalls (execve ...) and to prevent certain filenames like `/home/gift/flag.txt` from being read with the `open` and `openat` syscalls. The challenge also prints a pointer in the `.bss` section and thus PIE doesn't matter as we have a leak.
