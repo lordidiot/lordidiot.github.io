@@ -11,7 +11,7 @@ comments: true
 >
 > Good luck and have fun climbing Heap Heaven 2018!
 >
-> nc arcade.fluxfingers.net 1809
+> nc arcade.fluxfingers.net 1809 (Solves: 48, 246 pts)
 >
 > [heap\_heaven\_2][binary] [libc.so.6][libc] [+exploit.py][exploit]
 
