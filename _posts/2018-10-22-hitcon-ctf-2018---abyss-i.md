@@ -49,9 +49,9 @@ After solving the first challenge, I was optimistic to make my attempt at my fir
 PS: If anybody wants to be like Reg and help me out in this abyss that is the land of kernels and hypervisors, do HMU.
 
 
-[binary]:{{site.baseurl}}/ctf/2018-10-22-hitcon-ctf-2018---abyss-i/user.elf
-[libc]:{{site.baseurl}}/ctf/2018-10-22-hitcon-ctf-2018---abyss-i/libc.so.6
-[kernel]:{{site.baseurl}}/ctf/2018-10-22-hitcon-ctf-2018---abyss-i/kernel.bin
-[hypervisor]:{{site.baseurl}}/ctf/2018-10-22-hitcon-ctf-2018---abyss-i/hypervisor.elf
-[exploit1]:{{site.baseurl}}/ctf/2018-10-22-hitcon-ctf-2018---abyss-i/exploit1.py
+[binary]:{{site.baseurl}}/ctf/2018-10-22-hitcon-ctf-2018---abyss/user.elf
+[libc]:{{site.baseurl}}/ctf/2018-10-22-hitcon-ctf-2018---abyss/libc.so.6
+[kernel]:{{site.baseurl}}/ctf/2018-10-22-hitcon-ctf-2018---abyss/kernel.bin
+[hypervisor]:{{site.baseurl}}/ctf/2018-10-22-hitcon-ctf-2018---abyss/hypervisor.elf
+[exploit1]:{{site.baseurl}}/ctf/2018-10-22-hitcon-ctf-2018---abyss/exploit1.py
 [boilerplate]:https://github.com/david942j/kvm-kernel-example/tree/master/kernel
