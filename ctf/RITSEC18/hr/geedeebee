@@ -1,0 +1,28 @@
+gef config context.enable 0
+set print thread-events off
+set print address off
+file ./pwn2
+set environment LD_PRELOAD ./libc.so.6
+
+define mallocfinish
+	finish
+	printf "= %p\n", $eax
+	continue
+end
+
+
+b * 0x8048f90 
+commands 1
+	silent
+	printf "malloc(%d)          #", *(int)($sp+4)
+	mallocfinish
+end
+
+b * 0x8048f30
+commands 2
+	silent
+	printf "free(%p)\n", *(unsigned int*)($sp+4)
+	c
+end
+
+r
