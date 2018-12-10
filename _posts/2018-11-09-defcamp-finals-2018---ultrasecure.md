@@ -83,7 +83,7 @@ We(HATS Singapore) ended the CTF in 12th place of 17 finalist teams. This CTF wa
 [bin1]:{{site.baseurl}}/ctf/2018-11-09-defcamp-finals-2018---ultrasecure/UltraSecure.so
 [bin2]:{{site.baseurl}}/ctf/2018-11-09-defcamp-finals-2018---ultrasecure/UltraSecure-2.so
 [auto]:{{site.baseurl}}/ctf/2018-11-09-defcamp-finals-2018---ultrasecure/auto.py
-[fedex]:[https://twitter.com/FetchDEX]
-[github]:[https://github.com/NitescuLucian/simple-pam]
-[writeup]:[https://github.com/Inndy/ctf-writeup/tree/master/2018-d-ctf-final/ultimate-secure]
+[fedex]:https://twitter.com/FetchDEX
+[github]:https://github.com/NitescuLucian/simple-pam
+[writeup]:https://github.com/Inndy/ctf-writeup/tree/master/2018-d-ctf-final/ultimate-secure
 [ss]:{{site.baseurl}}/ctf/2018-11-09-defcamp-finals-2018---ultrasecure/ss.png
