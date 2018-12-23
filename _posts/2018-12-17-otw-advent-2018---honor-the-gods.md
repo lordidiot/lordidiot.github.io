@@ -26,7 +26,7 @@ I had intended to do everything myself. But halfway through cooking, the process
 ```
 spaghetti.elf
 	|_ (grandparent process) pasta 
-		|
+	|
 	|_ (grandchild process) meatballs
 ```
 With the meatballs ready for cooking, I heated up the oil and threw them in. I had initially planned to only cook a few at a time. But my grandma was a bit more ambitious and threw everything in. Sadly, the nice round shape of the meatballs disappeared after being cooked in the flat pan. I'm not sure how to fix this, if anyone knows please comment. Some of the meatballs also ended up getting burnt on some sides as I couldn't handle that many in a single pan. But in general, I think they came out okay for a first attempt.
