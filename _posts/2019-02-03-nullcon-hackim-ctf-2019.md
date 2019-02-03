@@ -18,17 +18,18 @@ This weekend my team HATS SG played in the nullcon HackIM CTF. I think this was 
 
 #### Crypto
 - 2FUN - Solves: ?, 448pts
-- GenuineCounterMode - Solves: ?, 462pts
-- Singular - Solves: ?, 485pts
+- [GenuineCounterMode - Solves: ?, 462pts](https://github.com/Ariana1729/CTF-Writeups/tree/master/2019/nullcon/GenuineCounterMode)*
+- [Singular - Solves: ?, 485pts](https://github.com/Ariana1729/CTF-Writeups/tree/master/2019/nullcon/Singular)*
 
 #### Web
 - **oof**
 
 #### Misc
-- Captcha Forest - Solves: ?, 150pts
-- Captcha Forest Harder - Solves: ?, 431pts
-- mlAuth - Solves: ?, 475pts
+- [Captcha Forest - Solves: ?, 150pts](https://tcode2k16.github.io/blog/posts/2019-02-03-nullcon-hackim-writeup/#captcha-forest)*
+- [Captcha Forest Harder - Solves: ?, 431pts](https://tcode2k16.github.io/blog/posts/2019-02-03-nullcon-hackim-writeup/#captcha-forest-harder)*
+- [mlAuth - Solves: ?, 475pts](https://tcode2k16.github.io/blog/posts/2019-02-03-nullcon-hackim-writeup/#mlauth)*
 
+*external links
 
 # Writeups
 
