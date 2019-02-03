@@ -17,7 +17,7 @@ This weekend my team HATS SG played in the nullcon HackIM CTF. I think this was 
 - tudutudututu - Solves: ?, 495pts
 
 #### Crypto
-- 2FUN - Solves: 72, 448pts
+- 2FUN - Solves: ?, 448pts
 - GenuineCounterMode - Solves: ?, 462pts
 - Singular - Solves: ?, 485pts
 
