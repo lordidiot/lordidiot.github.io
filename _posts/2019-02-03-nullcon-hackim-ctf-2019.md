@@ -11,9 +11,9 @@ This weekend my team HATS SG played in the nullcon HackIM CTF. I think this was 
 
 #### Pwn
 - [easy-shell - Solves: ?, 451pts](#easy-shell)
-- HackIM Shop - Solves: ?, 458pts
+- [HackIM Shop - Solves: ?, 458pts](#hackim-shop)
 - [peasy-shell - Solves: ?, 493pts](#peasy-shell)
-- babypwn - Solves: ?, 495pts
+- [babypwn - Solves: ?, 495pts](#babypwn)
 - tudutudututu - Solves: ?, 495pts
 
 #### Crypto
@@ -172,3 +172,120 @@ I skipped a lot of details about the exploit in this writeup, if you are unclear
 
 [challenge-peasy]:{{site.baseurl}}/ctf/nullcon19/peasy-shell/gg
 [exploit-peasy]:{{site.baseurl}}/ctf/nullcon19/peasy-shell/exploit.py
+
+## HackIM Shop
+> [challenge][challenge-hackim] [+exploit.py][exploit-hackim] [+libc6_2.27-3ubuntu1_amd64.so][libc-hackim]
+
+### Overview
+Menu pwnable! My fav <3
+```
+NullCon Shop
+(1) Add book to cart
+(2) Remove from cart
+(3) View cart
+(4) Check out
+> 
+```
+
+After reversing the binary, I noticed that the `remove_book` functionality did not clear up the pointer for a book in the list of books after freeing the memory. This is a use-after-free of (UAF) bug. Now we should check out the structure of a book to see what we could possible exploit if we can control the chunk.
+{% highlight C %}
+struct book{
+    QWORD index;
+    char * data;
+    QWORD price;
+    char copyright[32];
+}
+{% endhighlight %}
+
+Now the `copyright` buffer is something interesting to us. If you look at the `print_books` functionality, there is the following line.
+
+{% highlight C %}
+printf(books[i]->copyright);
+{% endhighlight %}
+
+Usually, this buffer will only contain "Copyright NullCon Shop". However, should we be able to control this value, this is a classic format string vulnerability.
+
+### Exploitation
+Now that we are aware of two big vulnerabilities, we can see the path we should take for exploitation. We should somehow make use of this UAF vulnerability to control the contents of the copyright buffer, then we can do quite a lot with the format string vulnerability. So how can we control this UAF? We can make use of the heap's fitting logic, which allows us to have the data pointer of one chunk point to a book. Then we can write any arbitrary pointer we one in that fake book.
+```
+make two books, with data size 0x10
+[ 0x38 bytes ] BOOK_1
+[ 0x10 bytes ] DATA_1
+[ 0x38 bytes ] BOOK_2
+[ 0x10 bytes ] DATA_2
+
+after we free both books
+  0x38 bytes   BOOK_1
+  0x10 bytes   DATA_1
+  0x38 bytes   BOOK_2
+  0x10 bytes   DATA_2
+
+Now if we were to allocate a new book with data of size 0x38 instead...
+[ 0x38 bytes ] BOOK_1
+  0x10 bytes   unused
+[ 0x38 bytes ] DATA_1 and BOOK_2
+  0x10 bytes   unused
+```
+With this setup, we control all the members of BOOK_2, including the `copyright` buffer! Since we also control the data pointer for BOOK_2 through the contents of DATA_1, we can leak the libc addresses using the `data` pointer of BOOK_2. After leaking, we can figure out the libc version using tools like niklasb's [libc-db](https://github.com/niklasb/libc-database).
+
+After this, we can try to exploit the format string vulnerability. The first thing we do is to check what the stack looks like during the printf call. If we can control any pointers within the stack when the printf is called, this allows to have an arbitrary write or read primitive. And indeed, we do! Luckily for us, when the printf call occurs, the index of the book is on the stack, since we control the book structure, we can write any arbitrary pointer as the index.
+
+With this arbitrary read and write primitive. I began to exploit this challenge using the `house-of-spirit` technique inside the Global Offset Table (GOT). I used the format string vuln to write the correct size bytes in the GOT. Then, by freeing the fake BOOK_2 that we created, I could also achieve an arbitrary free. With these two combined, I could arbitrarily free the fake chunk that I placed within the GOT. Now, when I allocated a new book, it's data pointer would point inside the GOT, allowing me to write many `one_gadgets` inside the GOT that would pop a shell for me!
+
+`hackim19{h0p3_7ha7_Uaf_4nd_f0rm4ts_w3r3_fun_4_you}`
+
+[challenge-hackim]:{{site.baseurl}}/ctf/nullcon19/HackIM_Shop/challenge
+[exploit-hackim]:{{site.baseurl}}/ctf/nullcon19/HackIM_Shop/exploit.py
+[libc-hackim]:{{site.baseurl}}/ctf/nullcon19/HackIM_Shop/libc6_2.27-3ubuntu1_amd64.so
+
+## babypwn
+> [challenge][challenge-babypwn] [+exploit.py][exploit-babypwn]
+
+### Overview
+This challenge was actually quite straightforward. And I'm a bit surprised it didn't have more solves (I found HackIM harder), maybe it's because the scanf trick was not so known. Regardless here is the solution I used. The challenge has two vulnerabilities. Firstly, there is the format string vulnerability in the name.
+{% highlight C %}
+_isoc99_scanf("%50s", format + 14);
+...
+printf(format); // vulnerable pattern!
+{% endhighlight %}
+This allows us to use "%p" to leak pointers present in the stack. Thus we can leak a libc pointer in the stack and bypass ASLR to find the libc base in memory.
+
+```
+Create a tressure box?
+Y
+name: %p.%p.%p.%p.%p
+How many coins do you have?
+0
+Tressure Box: 0x1.0x7fc685178790.0x10.(nil).(nil) created!
+```
+
+The second vulnerability is the signed check when asking for the number of coins we want.
+{% highlight C %}
+if ( (char)numcoins > 20 )  // signed
+{
+    perror("Coins that many are not supported :/\r\n");
+    exit(1);
+}
+{% endhighlight %}
+If we provided a negative `numcoins` like `0xff (-1)`, this would pass the signed check, but the following for loop would treat `numcoins` as an unsigned variable, allowing us to write `0xff (255)` dwords in the stack. This means we can overwrite the saved `rip` in stack (just like a buffer overflow). 
+
+{% highlight C %}
+for ( i = 0; i < numcoins; ++i ) // unsigned
+{
+    v8 = &v15[4 * i];
+    _isoc99_scanf("%d", v8);
+}
+{% endhighlight %}
+
+However, there is also a stack canary! If we overwrite this with a wrong value, this will cause the program to exit prematurely before returning, which ruins our exploit. Now we can bypass this canary if we can leak it, like through the format string vulnerability. However, the format string is only printed after we've specified all the coins, thus we cannot know the canary when writing. This requires knowledge of a cool scanf trick. When scanf is called like so:
+
+{% highlight C %}
+scanf("%d", ...);
+{% endhighlight %}
+
+You can provide the characters `-` or `+`, and the scanf will not change the value of the variable. Thus, we can use this to not destroy the canary while overwriting the saved rip. Afterwards, we just need to change saved `rip` back to main, so we can overflow one more time to return to a `one_gadget`.
+
+`hackim19{h0w_d1d_y0u_g37_th4t_c00k13?!!?}`
+
+[challenge-babypwn]:{{site.baseurl}}/ctf/nullcon19/babypwn/challenge
+[exploit-babypwn]:{{site.baseurl}}/ctf/nullcon19/babypwn/exploit.py
