@@ -14,7 +14,7 @@ This weekend my team HATS SG played in the nullcon HackIM CTF. I think this was 
 - [HackIM Shop - Solves: ?, 458pts](#hackim-shop)
 - [peasy-shell - Solves: ?, 493pts](#peasy-shell)
 - [babypwn - Solves: ?, 495pts](#babypwn)
-- tudutudututu - Solves: ?, 495pts
+- [tudutudututu - Solves: ?, 495pts](#tudutudututu)
 
 #### Crypto
 - 2FUN - Solves: ?, 448pts
@@ -34,6 +34,10 @@ This weekend my team HATS SG played in the nullcon HackIM CTF. I think this was 
 # Writeups
 
 ## easy-shell
+> Go get yourself a shell while it's possible
+>
+> nc pwn.ctf.nullcon.net 4010
+>
 > [challenge][challenge-easy] [+exploit.py][exploit-easy]
 
 **Disclaimer:** I was not the one who solved this during the CTF, my teammate Engimatrix solved this instead. However, I was working on a separate solution from him in parallel to have a better idea for when we want to solve the next part of the challenge 
@@ -110,6 +114,10 @@ After this, our shellcode will hit the `syscall`, and read some input from the u
 [exploit-easy]:{{site.baseurl}}/ctf/nullcon19/easy-shell/exploit.py
 
 ## peasy-shell
+> one more easy shell for free!
+>
+> nc pwn.ctf.nullcon.net 4011
+>
 > [challenge][challenge-peasy] [+exploit.py][exploit-peasy]
 
 ### Overview
@@ -175,6 +183,10 @@ I skipped a lot of details about the exploit in this writeup, if you are unclear
 [exploit-peasy]:{{site.baseurl}}/ctf/nullcon19/peasy-shell/exploit.py
 
 ## HackIM Shop
+> Welcome to our bookstore, check if you find anything interesting.
+>
+> nc pwn.ctf.nullcon.net 4002
+>
 > [challenge][challenge-hackim] [+exploit.py][exploit-hackim] [+libc6_2.27-3ubuntu1_amd64.so][libc-hackim]
 
 ### Overview
@@ -240,6 +252,10 @@ With this arbitrary read and write primitive. I began to exploit this challenge 
 [libc-hackim]:{{site.baseurl}}/ctf/nullcon19/HackIM_Shop/libc6_2.27-3ubuntu1_amd64.so
 
 ## babypwn
+> Can you exploit the basic bugs?
+>
+> nc pwn.ctf.nullcon.net 4001
+>
 > [challenge][challenge-babypwn] [+exploit.py][exploit-babypwn]
 
 ### Overview
@@ -290,3 +306,78 @@ You can provide the characters `-` or `+`, and the scanf will not change the val
 
 [challenge-babypwn]:{{site.baseurl}}/ctf/nullcon19/babypwn/challenge
 [exploit-babypwn]:{{site.baseurl}}/ctf/nullcon19/babypwn/exploit.py
+
+
+## tudutudututu
+> I found a ToDo service to maintain my daily tasks. My life is sorted now!
+>
+> nc pwn.ctf.nullcon.net 4003
+>
+> [challenge][challenge-tudu] [+exploit.py][exploit-tudu]
+
+```
+Menu:
+(1) Create a new todo
+(2) Set description for a todo
+(3) Delete an existing todo
+(4) Print todos
+(5) Exit
+
+> 
+```
+Another heap menu pwnable! 
+
+### Overview
+This challenge is supposed to be a program to create todos to remember things. When creating a new todo, the program does a simple `malloc(0x10)` followed by a `strdup(user_input)`, creating 2 chunks in the heap.
+
+```
+[ 0x10 bytes ] todo_1
+[ 0x? bytes ] topic_1
+```
+
+The structure of the todo is as follows:
+
+{% highlight C %}
+struct todo{
+    char * topic;
+    char * description;
+}
+{% endhighlight %}
+
+Now after we initialise the todo with a topic, we have the additional option of adding a description to the todo, this will allocate a new chunk and set the pointer to the chunk in the struct of the todo. The fatal error however, is that this description pointer is not initialised to zero when a todo is created. This means that if there is leftover data in the chunk when it was allocated, the program will think that it is the description pointer. When we reverse the `delete` functionality, we can see these lines of code.
+
+{% highlight C %}
+if ( desc )
+    free(desc);
+free(_todo);
+{% endhighlight %}
+
+Thus, if we can control the value of this uninitialised description member, we can exploit it through the `delete` functionality of the program. In essense, should we control this description member, we have an arbitrary free primitive.
+
+### Exploitation
+Now that we understand the main bug, we can try to exploit this. The steps to exploit the uninitialised member are as follows.
+```
+create new todo, with 0x10 byte topic
+[ 0x10 bytes ] todo_1
+[ 0x10 bytes ] topic_1
+
+free this todo
+  0x10 bytes   old_todo_1
+  0x10 bytes   old_topic_1
+
+allocate 2 new todos, with topics larger than 0x10 bytes
+[ 0x10 bytes ] todo_2
+[ 0x10 bytes ] todo_3 !! ( this used to be old_topic_1 )
+[ 0x? bytes ] topic_2
+[ 0x? bytes ] topic_3
+```
+
+As we can see from this scenario, `todo_3` uses the same chunk that `topic_1` previously used. In this case, we can write an address at the 8 byte offset of `topic_1`, this will then be used as the description of `todo_3` later on. With this primitive, we can arbitrarily read any address, and free any address. Since we can leak any address, I utilised this to leak the heap address and the libc base.
+
+### rip control
+Now that we have all the leaks we probably will ever need, we need to figure out how to control `rip` to change program execution. How I did this was to transition our arbitrary free to a `fastbin double free`. Since we knew the address of the heap, we could create 2 todos that had descriptions or topics pointing to the same chunk. If we freed both these todos, we would thus create a circular fastbin list, allowing us to perform a `fastbin attack`. Now to utilise this `fastbin attack` to control `rip`, I made it return an arbitrary chunk before the location of `__malloc_hook`. This allows me to overwrite the value of `__malloc_hook` with a `one_gadget`. And that gets us our shell!
+
+`hackim19{D0nt_f0r93t_t0_1ni7i4liz3}`
+
+[challenge-tudu]:{{site.baseurl}}/ctf/nullcon19/tudutudututu/challenge
+[exploit-tudu]:{{site.baseurl}}/ctf/nullcon19/tudutudututu/exploit.py
