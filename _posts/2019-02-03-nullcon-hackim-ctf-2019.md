@@ -21,6 +21,9 @@ This weekend my team HATS SG played in the nullcon HackIM CTF. I think this was 
 - [GenuineCounterMode - Solves: ?, 462pts](https://github.com/Ariana1729/CTF-Writeups/tree/master/2019/nullcon/GenuineCounterMode)*
 - [Singular - Solves: ?, 485pts](https://github.com/Ariana1729/CTF-Writeups/tree/master/2019/nullcon/Singular)*
 
+#### Rev
+- [0bfusc8 much - Solves: ?, 497pts](https://daniellimws.github.io/obfusc8.html)
+
 #### Web
 - **oof**
 
