@@ -9,7 +9,7 @@ comments: true
 
 > nc stack.overflow.fail 9001
 >
-> by hk (Solves: 5, 1150 pts)
+> by hk (Solves: 7, 1150 pts)
 >
 > [ppc][ppc] [+exploit.py][exploit]
 
