@@ -18,3 +18,9 @@ I am Lord_Idiot, a Singaporean boy who loves to play CTFs (especially pwnables).
 ## help
 
 This blog will be mostly just writeups from CTFs I've participated in, but I may write other types of posts in the future.
+
+## ls -la /friends
+
+Check out the blogs of some of my friends too.
+- [daniellimws](http://daniel.is.an.idiot.sg)
+- [tcode2k16](http://alan.is.an.idiot.sg)
