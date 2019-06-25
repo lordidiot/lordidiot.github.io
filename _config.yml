@@ -26,6 +26,13 @@ copyright:
   year:             2018
   name:             lordidiot
 
+# Open Graph tags
+og:
+  name:             "Lord_Idiot's blog" 
+  title:            "Blog posts and writeups by Lord_Idiot"
+  type:             "blog"
+  
+
 # Google-analytics
 google-analytics:
   id:               "UA-129354378-1"
