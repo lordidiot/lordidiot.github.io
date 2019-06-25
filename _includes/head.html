@@ -6,18 +6,22 @@
   {% if site.google-analytics %}
   <!-- Open Graph tags -->
     {% if site.google-analytics.name %}
-      <meta property="og:site name" content="{{ site.og.name }}"/>
+    <meta property="og:site name" content="{{ site.og.name }}"/>
     {% endif %}
 
     {% if site.google-analytics %}
-      <meta property="og:title" content="{{ site.og.title }}"/>
+    <meta property="og:title" content="{{ site.og.title }}"/>
     {% endif %}
 
     {% if site.google-analytics %}
-      <meta property="og:type" content="{{ site.og.type }}"/>
+    <meta property="og:description" content="{{ site.og.description }}"/>
     {% endif %}
 
-      <meta property="og:image" content="{{ site.baseurl }}/images/og_img.png"/>
+    {% if site.google-analytics %}
+    <meta property="og:type" content="{{ site.og.type }}"/>
+    {% endif %}
+
+    <meta property="og:image" content="{{ site.baseurl }}/images/og_img.png"/>
   {% endif %}
 
   <!-- favicon-->
