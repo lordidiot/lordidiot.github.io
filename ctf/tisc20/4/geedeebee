@@ -1,0 +1,23 @@
+
+	gef config context.enable 0
+	set follow-fork-mode parent
+	set print thread-events off
+	set print address off
+	file ./anorocware
+
+	set $ctr=0
+	break * 0x61e210
+	command 1
+		x/s $rbx
+		i r rsi
+		quit
+	end
+
+	break * 0x661506
+	command 2
+		set {int}($rsp+8)=82914
+		continue
+	end
+
+	run
+	
