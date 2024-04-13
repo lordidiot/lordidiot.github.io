@@ -394,6 +394,8 @@ Overall, I think this was a pretty successful experiment!
 I don't know if this would be a particularly practical technique, considering that the computation necessary is similar to that of finetuning.
 Nevertheless, I'm happy to see that it kind of works, and I'm curious to see if it can work for more complicated tasks as well.
 
+**Edit:** Seems this concept is called prefix-tuning! A much more in-depth paper about this [here](https://arxiv.org/abs/2101.00190).
+
 If you're interested to check out the code for this project, I've uploaded it on my [github](https://github.com/lordidiot/backprompt).
 
 
