@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+.blog-post-body h1 {
+  @apply text-2xl;
+}
+
+.blog-post-body h2 {
+  @apply text-xl;
+}
+
+.blog-post-body h3 {
+  @apply text-lg;
+}

@@ -1,4 +1,8 @@
 ---
+import '../styles/global.css'
+import '../styles/blog-post.css'
+import '@fontsource-variable/lora';
+
 export interface Props {
   title: string
 }
@@ -10,13 +14,15 @@ const { title } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
-    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <header>
-      <nav>
-        <a href="/">Home</a>
-        <a href="/about">About</a>
+    <header class="middle-screen pt-5">
+      <nav class="w-full flex flex-row justify-between text-2xl">
+        <a href="/">idiot<span class="text-gray-500">.sg</span></a>
+        <div class="flex flex-row gap-x-12">
+          <a href="/blog">posts<span class="text-gray-500">.</span></a>
+          <a href="/widgets">widgets<span class="text-gray-500">.</span></a>
+        </div>
       </nav>
     </header>
     <main>
