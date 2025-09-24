@@ -13,6 +13,7 @@
     "@fontsource-variable/reddit-mono": "^5.2.8",
     "@tailwindcss/vite": "^4.1.13",
     "astro": "^5.13.8",
+    "rehype-external-links": "^3.0.0",
     "tailwindcss": "^4.1.13"
   }
 }
