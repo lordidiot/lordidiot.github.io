@@ -26,7 +26,7 @@ Now the challenge is starting to make more sense, since the SSH service is runni
 
 In the password check for authentication, our user-given password copied on to the stack buffer is compared with a very large string of "A"s. 
 
-```C
+```c
 if ( !strcmp(
       &dest,
       "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"

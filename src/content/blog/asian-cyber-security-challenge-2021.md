@@ -78,7 +78,7 @@ But enough of the storytelling, here are the writeups!
 
 The code for this challenge was rather straightforward.
 
-```C
+```c
 /* Call this function! */
 void win(void) {
   char *args[] = {"/bin/sh", NULL};
@@ -109,7 +109,7 @@ Provided a `win` function that we can jump to when we achieve code execution, we
 
 However, we observe that `length` is an **int** and `readint` uses `atoi`(which allows negative numbers) to read.
 
-```C
+```c
 int readint(const char *msg) {
   char buf[0x10];
   readline(msg, buf, 0x10);
@@ -126,7 +126,7 @@ int main() {
 Therefore, we can provide a _negative_ length, that when interpreted as a length by `readline` will be a large size instead.
 This allows us to buffer overflow and overwrite the saved return pointer on stack, giving us code execution to get the flag!
 
-```Python
+```python
 def exploit(r):
     rop = "A"*280
     rop+= p64(e.symbols["win"])
@@ -155,7 +155,7 @@ The binary does some calculations to produce a histogram for the web frontend.
 
 The important pieces of code are here:
 
-```C
+```c
 #define WEIGHT_MAX 600 // kg
 #define HEIGHT_MAX 300 // cm
 #define WEIGHT_STRIDE 10
@@ -243,7 +243,7 @@ This challenge was a fake HTTP server written in C, with a proxy that only allow
 
 The proxy looked like so:
 
-```Python
+```python
 #!/usr/bin/python3
 ...
 LIMIT = 4096
@@ -282,7 +282,7 @@ stdout.buffer.write(res)
 
 The C code for the webserver was rather lengthy, so I shortened it to highlight the bug we are dealing with.
 
-```C
+```c
 char* http_receive_request() {
   ...
   char buffer[BUFFERSIZE] = {};
@@ -355,7 +355,7 @@ With these gadgets, we can perform a routine like so:
 
 Here is the exploit that does this.
 
-```Python
+```python
 extra = "\n"
 rdi = lambda x : p64(0x4010d3)+p64(x)
 rsi = lambda x : p64(0x4010d1)+p64(x)*2
@@ -456,7 +456,7 @@ def exploit(r):
 This challenge was a menu-esque pwn that implemented its own allocator functions.
 The allocator was similar to a bump-allocator, but with an additional freelist mechanism.
 
-```C
+```c
 char c_memory[1000];
 unsigned int c_size = 0;
 
@@ -518,7 +518,7 @@ b
 
 One behaviour that was buggy was the `delete` functionality.
 
-```C
+```c
 int main(){
   ...
 	init();
@@ -566,7 +566,7 @@ This way, I can avoid thinking too much about [heap fengshui](https://en.wikiped
 The first behaviour I abused was deleting a node and then allocating a new one.
 This will cause a heap overflow due to the freelist behaviour.
 
-```Python
+```python
 def exploit(r):
     f("AAA=aaaaaa")
     f("BBB=bbbb")
@@ -588,7 +588,7 @@ We can thinking too much about the behaviour, and just inspect the memory in gdb
 
 As we can see, the `data` struct for the node is at 0x00005555555575c0 with
 
-```C
+```c
 {
   .data = "\xc0\x75\x55\x55\x55\x55\x00\x00"
   .name = "CCC"
@@ -605,7 +605,7 @@ So _somehow_, we've created an arrangement that leads to a leak! We can just typ
 We can repeat this strategy for the other bug we found, and see what it yields us!
 Since the bug occurs when we free the first node, we just create one node and free it.
 
-```Python
+```python
 def exploit(r):
     f("AAA=aaaa")
     f("delete:AAA")
@@ -631,7 +631,7 @@ This means we can control the doubly-linked-list!
 
 With some more magickery, this powerful primitive allows us to solve the challenge by overwriting a pointer in GOT.
 
-```Python
+```python
 def exploit(r):
     f = lambda x : r.sendafter(">>> ", x)
 
@@ -699,7 +699,7 @@ To be written, exploit for now: [link](https://gist.github.com/lordidiot/7990a49
 
 This challenge used an interesting way to apply the RSA cryptosystem.
 
-```Python
+```python
 import gmpy2
 from Crypto.Util.number import long_to_bytes, bytes_to_long, getStrongPrime, inverse
 from Crypto.Util.Padding import pad
@@ -741,7 +741,7 @@ Then, each encrypted message was xor'd with a 256-byte block of the challenge co
 
 The second part was easy to undo, as we could just use the commutative property and the `A^A==0` identity of xor to undo the xor, seeing that we have access to the challenge files.
 
-```Python
+```python
 i = 0
 c = [0]*3
 for a in range(0,len(f),256):
@@ -759,7 +759,7 @@ This will give us 3 different encryptions of the same message (flag). All encryp
 Since the `gmpy2.next_prime` function was used to generate the second and third values of `e` from the first value (0x10001).
 We could use its deterministic nature to regenerate the second and third values ourselves.
 
-```Python
+```python
 e = [0]*3
 e[0] = 0x10001
 e[1] = gmpy2.next_prime(e[0])
@@ -776,7 +776,7 @@ However, I stumbled upon a useful stackexchange [reply](https://crypto.stackexch
 
 We can then implement the computations to solve the challenge. Note: This should be done in Python3 because python3.8+ allows negative powers with modulus (modinv).
 
-```Python
+```python
 from Crypto.Util.number import long_to_bytes
 
 def extended_euclid_gcd(a, b):
@@ -822,7 +822,7 @@ Fortunately for us, many error messages were left in the binary.
 This aided greatly in reversing.
 Then we just have to make some small assumptions on function renaming to get the following rough decompile.
 
-```C
+```c
 __int64 __fastcall sub_240(__int64 a1, __int64 a2)
 {
   ...
@@ -1007,7 +1007,7 @@ Whenever one is encountered, the signal handler will then appropriately decrypt 
 Then the decrypted code will be run.
 After extracting the decrypted code, it looks like so.
 
-```C
+```c
 void __noreturn sub_1A9A()
 {
   unsigned __int16 v0; // [rsp+1Ah] [rbp-56h]
@@ -1032,7 +1032,7 @@ This way, two exact match bytes will likely still look different after being enc
 
 To reverse this, I bruteforced the random element as its range was only from 0-255(0xff). Then I used Windows File Explorer to detect which jpg is valid.
 
-```Python
+```python
 import sys
 
 with open(sys.argv[1], 'rb') as f:
@@ -1376,7 +1376,7 @@ At a first glance to me, this configuration looked secure as the `@prerender` fu
 
 Checking out the `app.py` file that controls the internal api server, we notice something interesting!
 
-```Python
+```python
 import os
 from flask import Flask, jsonify
 

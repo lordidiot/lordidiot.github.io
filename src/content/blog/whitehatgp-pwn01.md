@@ -38,7 +38,7 @@ Your choice:
 
 We are first asked for a name, which is vulnerable to a format string attack.
 
-```C
+```c
 snprintf((char *)&orders + 96 * i, 30uLL, &name_l);
 snprintf((char *)&orders + 96 * i + 30, 30uLL, &recv_l);
 ```
@@ -59,7 +59,7 @@ Now we have a heap address leak, but how do we redirect code execution signifcan
 
 
 So what ROP chain do we write? I initially tried a open-read-puts ROP chain in order to read the flag `/home/gift/flag.txt`. However, there were two issues with this. Firstly, the ptrace debugger program checks for banned file names when the `open` and `openat` sycalls are called.
-```C
+```c
 //example of the black list for sys_open
 431 if (sysCall == SYSCALL_OPEN) { // open
 432     string filePath = getCString(global_child_id, regs.rdi);

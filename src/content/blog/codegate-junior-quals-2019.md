@@ -27,7 +27,7 @@ Looks like some encoding format, it has too many different special characters so
 
 The challenge provides us with the main driver binary and 20000 accompanying .so files.
 
-```C
+```c
 printf("INPUT : ", 0LL, &v13);
 __isoc99_scanf("%d", &v8);
 if ( (signed int)v8 <= 0 && (signed int)v8 > 20000 )
@@ -63,7 +63,7 @@ This is pretty straightforward to reverse. In short, the program requests a numb
 
 Now that we understand the driver program, it will be a good idea to open up a few of the shared objects to see what they are doing. Reversing the `test` function from `lib_4323.so` gives the following code.
 
-```C
+```c
 puts("This is lib_4323 file.");
 puts("How do you find vulnerable file?");
 read(0, &buf, 0x32uLL);
@@ -72,7 +72,7 @@ system("exit");
 
 `lib_1337.so` has the following in the test function
 
-```C
+```c
 handle = dlopen("./20000_so/lib_14562.so", 1);
 if ( handle )
 {
@@ -120,7 +120,7 @@ I was originally thinking of using some frameworks or other complicated scriptin
 
 Now the next thing we would have to consider are the shared objects that use `system("ls \"%s\"")`. Now these might be exploitable as they contain some portion of user input. If the user is able to supply backticks or double quotes, we could escape the argument and call arbitrary sh commands. Thus we would have to figure out if the filter functions blocked these characters. This seemed complicated, so I wanted to first check whether there was a third possible argument that is passed into system, other than `ls` and `exit`. I did the same command `grep -rnw "ls \"%s\""` and to my surprise it gave me 4999 matches! Immediately, I knew I had gotten the answer. Earlier I had pruned 15000 shared objects, now that I remove 4999 objects, I am only left with one! The only remaining shared object file is `lib_17394.so`. Quickly reversing this shows us that it has the following lines.
 
-```C
+```c
 sprintf(&s, "%s 2 > /dev/null", &buf, v4);
 system(&s);
 ```

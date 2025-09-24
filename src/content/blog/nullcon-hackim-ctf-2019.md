@@ -96,7 +96,7 @@ pop rcx
 ```
 With these instructions, do you see how we can perform our self-modifiying shellcode? Since we know that we can push any registers, we can notice from above that `rsi, rip, r12` all contain a pointer to our shellcode. Thus we can simply push this value onto the stack, then pop it off into `rcx`. Now using the `push imm32` followed by a `pop rax`, we are able to get any 4 byte value (within alphanumeric range) into eax. Now we are in a perfect setup to use the `xor DWORD PTR [rcx + imm8], eax` to xor some instructions in our own shellcode! Now all we have to do is to find pairs of alphanumeric characters that xor to form `\x0f` and `\x05`. Just open up your python interpreter and do a quick bruteforce.
 
-```Python
+```python
 charset = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
 for i in charset:
@@ -125,7 +125,7 @@ After this, our shellcode will hit the `syscall`, and read some input from the u
 Now, after Enigmatrix had solved easy-shell, we began working on the sequel `peasy-shell`. This challenge is pretty much the same, with the big difference that the shellcode region is made **RX** before we jump to it. This is tragic as it kills our self-modifying strategy to achieve the `syscall` instruction. ... Or does it?
 
 If you were to do a quick reversing of the `make_rx` function that they use to do this, you will notice something very important.
-```C
+```c
 int __fastcall make_rx(void *a1)
 {
   int result; // eax@1
@@ -169,7 +169,7 @@ Now our shellcode should not be failing this many times, a 50% chance to work is
 
 ### Size matters
 So what's interesting about this challenge is that at the end of our shellcode, the binary will add a `ret` instruction.
-```C
+```c
 *((_BYTE *)buf + v6) = 0xC3u;
 ```
 
@@ -202,7 +202,7 @@ NullCon Shop
 ```
 
 After reversing the binary, I noticed that the `remove_book` functionality did not clear up the pointer for a book in the list of books after freeing the memory. This is a use-after-free of (UAF) bug. Now we should check out the structure of a book to see what we could possible exploit if we can control the chunk.
-```C
+```c
 struct book{
     QWORD index;
     char * data;
@@ -213,7 +213,7 @@ struct book{
 
 Now the `copyright` buffer is something interesting to us. If you look at the `print_books` functionality, there is the following line.
 
-```C
+```c
 printf(books[i]->copyright);
 ```
 
@@ -261,7 +261,7 @@ With this arbitrary read and write primitive. I began to exploit this challenge 
 
 ### Overview
 This challenge was actually quite straightforward. And I'm a bit surprised it didn't have more solves (I found HackIM harder), maybe it's because the scanf trick was not so known. Regardless here is the solution I used. The challenge has two vulnerabilities. Firstly, there is the format string vulnerability in the name.
-```C
+```c
 _isoc99_scanf("%50s", format + 14);
 ...
 printf(format); // vulnerable pattern!
@@ -278,7 +278,7 @@ Tressure Box: 0x1.0x7fc685178790.0x10.(nil).(nil) created!
 ```
 
 The second vulnerability is the signed check when asking for the number of coins we want.
-```C
+```c
 if ( (char)numcoins > 20 )  // signed
 {
     perror("Coins that many are not supported :/\r\n");
@@ -287,7 +287,7 @@ if ( (char)numcoins > 20 )  // signed
 ```
 If we provided a negative `numcoins` like `0xff (-1)`, this would pass the signed check, but the following for loop would treat `numcoins` as an unsigned variable, allowing us to write `0xff (255)` dwords in the stack. This means we can overwrite the saved `rip` in stack (just like a buffer overflow). 
 
-```C
+```c
 for ( i = 0; i < numcoins; ++i ) // unsigned
 {
     v8 = &v15[4 * i];
@@ -297,7 +297,7 @@ for ( i = 0; i < numcoins; ++i ) // unsigned
 
 However, there is also a stack canary! If we overwrite this with a wrong value, this will cause the program to exit prematurely before returning, which ruins our exploit. Now we can bypass this canary if we can leak it, like through the format string vulnerability. However, the format string is only printed after we've specified all the coins, thus we cannot know the canary when writing. This requires knowledge of a cool scanf trick. When scanf is called like so:
 
-```C
+```c
 scanf("%d", ...);
 ```
 
@@ -338,7 +338,7 @@ This challenge is supposed to be a program to create todos to remember things. W
 
 The structure of the todo is as follows:
 
-```C
+```c
 struct todo{
     char * topic;
     char * description;
@@ -347,7 +347,7 @@ struct todo{
 
 Now after we initialise the todo with a topic, we have the additional option of adding a description to the todo, this will allocate a new chunk and set the pointer to the chunk in the struct of the todo. The fatal error however, is that this description pointer is not initialised to zero when a todo is created. This means that if there is leftover data in the chunk when it was allocated, the program will think that it is the description pointer. When we reverse the `delete` functionality, we can see these lines of code.
 
-```C
+```c
 if ( desc )
     free(desc);
 free(_todo);

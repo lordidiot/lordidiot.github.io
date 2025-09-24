@@ -73,7 +73,7 @@ MOV(A, 0x11223344) = mov eax, 0x11223344 = B8 44 33 22 11
 ```
 If we performed a 1-byte jump with that integer overflow, we could jump past the `B8(mov)` opcode, and now our `imm32` param (0x11223344) is taken as the opcode! However, as we said before, we only control the least 2 significant bytes, so more accurately we could only write 0x00003344, but 2-byte of arbitrary shellcode is quite plenty for us. At this point, it seems like we've just got a shellcoding challenge left to do, however, we are forgetting that the `JMP/JEQ/JNE` have a check condition as mentioned in the earlier table. The check looks like so in the Java code.
 
-```Java
+```java
 case "JMP":
 case "JNE":
 case "JEQ":
@@ -89,7 +89,7 @@ At this point, we know that if we bypass this check for `JMP`-variant instructio
 Take note of how the Java and C code convert our string inputs "1337" into integer formats.
 
 In `compiler.c`, the `intbracket()` function is used:
-```C
+```c
 int intbracket(const char* s) {
   int mul = 1;
   if (*s == '-' || *s == '+') {
@@ -105,7 +105,7 @@ int intbracket(const char* s) {
 ```
 
 In `FancyJIT.java`, this function is called
-```Java
+```java
 ...
     Integer.parseInt(cmd.substring(4, cmd.length() - 1))));
 ...
@@ -139,7 +139,7 @@ Now, we should have all the bugs we need to exploit this challenge!
 
 I will briefly go through the exploitation flow that I used in this challenge. Since we want to get a shell, we would want to call the `execve` syscall with the following arguments, `rdi = pointer to "/bin/sh\x00"`, `rsi=0; rdx=0`, `rax=59 (execve syscall number)`. As we can effectively only run 2 bytes of shellcode at a time, we can ease our exploitation by forming the "/bin/sh\x00" string in memory using the constructs provided to us by the intermediate code. However, since we are limited in the value that we can place into the registers, I used a for loop to repeatedly increment the value of the eax register to 0x68732f("/sh\x00") and 0x6e69622f("/bin"), placing these values in the `rw-` region that is allocated for our code. However, one issue that occurred is that as mentioned [earlier](#overview), we are limited to jumping 10000 times (limited by the value of ecx). To solve this issue, I used the parser differential bug, to run 2-bytes of arbitrary shellcode twice, in order to change the value of rcx to something larger
 
-```C
+```c
 const char * prog[] = {
     "JMP(\xe0\xa5\xac)",
     ///////////// 0
@@ -187,7 +187,7 @@ With this done, our "/bin/sh" string has been placed in memory, and we just have
 ```
 If `rax` doesn't point to a writable region of memory, this will cause a SEGFAULT. As it turns out, it doesn't point to a writeable region, which sucks, but we can fix this within 2 bytes of shellcode. Since `r12` points to the writable `rw-` region, we can simply do `xchg rax, r12` which fits within 2 bytes, and sets our `rax` to a sane value. Afterwards, we can finish up the exploit with some simple pops, pushes and nops which nicely fit within 1 or 2 bytes. The full exploit code looks like so.
 
-```C
+```c
 const char * prog[] = {
     "JMP(\xe0\xa5\xac)",
     ///////////// 0

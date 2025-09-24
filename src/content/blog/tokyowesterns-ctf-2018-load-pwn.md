@@ -32,7 +32,7 @@ Segmentation fault (core dumped) <= YAY
 
 So now that we are able to control execution flow, I notice the next issue. Right before main returns, there is a call to `close_fd()`, which closes the file descriptors for STDIN, STDOUT and STDERR. What this means is that we will no longer be able to read data from the user or print data to the screen.
 
-```C
+```c
 int close_fd()
 {
   close(0);

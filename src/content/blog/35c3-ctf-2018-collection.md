@@ -29,7 +29,7 @@ This challenge provides us with some files. The important ones are `python3.6` a
 Now if you read the link I linked above, you would know that when the module is imported, it will call the initialisation function that has the name `PyInit_modulename`. Thus we should first try to reverse this function, from what I understand, it's equivalent to a main function or the init function in loadable kernel modules.
 
 ## PyInit
-```C
+```c
 PyObject *__cdecl PyInit_Collection()
 {
   if ( PyType_Ready((__int64)&CustomType) < 0 )
@@ -85,7 +85,7 @@ So, we can't jump to a one_gadget or call system("/bin/sh") since we can't use e
 ## tp_new and tp_init
 The next functions to take note of would be the new and init functions, since they are the first ones called when initalising a new Collection object. Being someone who doesn't like reverse engineering a lot, I kind of skimmed through these functions, which turned out to be my downfall later on (missed the intended vuln). In summary, tp_new checks if you initalised the object with a dictionary, and ensures that the dictionary only has 32 or less members. 
 
-```Python
+```python
 a = Collection.Collection({"a":1337, "b":["dab"], "c":{"d":"lmao"}}) # legal
 b = Collection.Collection(1337) # illegal
 ```
@@ -109,7 +109,7 @@ Sorry if this diagram is confusing, but it's a bit hard to explain. To understan
 ## Collection struct
 Now the Collection type is implemented as a Python object, so it will follow the Python object convention, which states that every object will start with 2 fields, `ob_refcnt` and `ob_type`. ob_refcnt is the reference counter for the object. This is important as it determines whether the object will be cleared by the garbage collector.
 
-```Python
+```python
 a = "dab" # now "dab".ob_refcnt = n
 b = a     # now "dab".ob_refcnt = n+1
 ```
@@ -118,7 +118,7 @@ When there are no more references to the "dab" object (no more variables in scop
 
 ob_type just points to the PyTypeObject for this particular object, so that Python will know all of it's properties like functions that it can call, or its data elements etc. Other than these two default fields, our Collection struct has additional properties, and the object looks something like this in memory.
 
-```Python
+```python
 a = Collection.Collection({"a":1337, "b":["dab"], "c":{"d":"lmao"}})
 ```
 
@@ -134,7 +134,7 @@ CollectionType for a^:
 ## get
 This function can be called like so.
 
-```Python
+```python
 a = Collection.Collection({"a":1337, "b":["dab"], "c":{"d":"lmao"}}) # legal
 print(a.get("a")) # will print 1337
 ```
@@ -144,7 +144,7 @@ When you call `.get("a")`, the function will traverse through the shape of the C
 ## Vuln?
 Now that we have a rough idea of how the module works. We tried to find the the vuln in the extension. After messing around for a while, we found a bug with how the Collection object handles the reference count of its members. Now if you recall from above, when you gain a reference to a Python object, you should increase the reference count of the corresponding object, this prevents the object from getting cleared by the Python garbage collector. However, what we found was that the `get()` function does not increase the `ob_refcnt` field for the member even though it is returning a new reference to this object. This would be okay if Python internally will increase the ob_refcnt, but it turns out this was not the case. Thus we could create a case where the `ob_refcnt` for the Collection's members keeps dropping, even though the collection object still holds a reference to it.
 
-```Python
+```python
 a = Collection.Collection({"a":1337, "b":["dab"], "c":{"d":"lmao"}}) # ob_refcnt for the "a" object = n
 a.get("a") # Since this doesn't assign to a variable, it will immediately go out of scope, Python will reduce ob_refcnt for the object
 a.get("a") # ob_refcnt = n-2
@@ -183,7 +183,7 @@ After this, I was stuck. Although now I could access arbitrary addresses as Pyth
 ## Post-CTF
 Now initially when I was trying to create an arbitrary write or read primtive, I tried making `get()` return a fake Python List Object I created in memory. I was hoping that this would grant me an arbitrary write through the List's contents.
 
-```C
+```c
 typedef struct {
     PyObject_VAR_HEAD
     /* Vector of pointers to list elements.  list[0] is ob_item[0], etc. */
@@ -206,7 +206,7 @@ typedef struct {
 
 Since this was my own fake object, I controlled `ob_item`, and I was hoping that I could set this to an address and write to it using .append() or []. However, this didn't seem to work out in the end. After the CTF ended, I skimmed through the [solution](https://github.com/bkth/35c3ctf/blob/master/collection/dist_exploit.py) of the author, and found out the element I was missing. Rather than using a python `List`, he used this type called `array.array`. It has some similarities to a List, but the big thing about this type is that it's contents are stored as C Types and not Python Objects! With this, an arbitrary read and write will be very easy.
 
-```C
+```c
 typedef struct {
     typedef struct arrayobject {
     PyObject_VAR_HEAD

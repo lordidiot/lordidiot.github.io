@@ -15,7 +15,7 @@ tags: [ctf, pwn]
 
 This challenge has a very small binary (6kb, my exploit code is half the size). And it only revolves around 1 function, which I named `get_format`. The code looks like this:
 
-```C
+```c
 void __fastcall __noreturn get_format(FILE *stream) // the stream passed was STDERR
 {
   while ( fgets(format, 256, stdin) )
@@ -53,7 +53,7 @@ If we want to change the address of STDERR `0x00007ffff7dd2520`, we will need to
 
 Rather than overwriting the FILE pointer on the stack to make it point to another structure for STDOUT, we could actually overwrite an important portion of the STDERR file structure which would allow us to recieve the input. To understand this technique, you must first understand that the FILE structure is just a wrapper that adds additional features for interacting with file descriptors. In the end, it still does contain the file descriptors it writes to, if we could change the file descriptor in the STDERR FILE structure to the file descriptor of STDOUT(1), we would be able to see output written to the STDERR FILE. You can check it out in the glibc source code.
 
-```C
+```c
 struct _IO_FILE
 {
   // [redacted]

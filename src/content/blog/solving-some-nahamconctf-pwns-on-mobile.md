@@ -62,7 +62,7 @@ The banned syscall numbers are shown in the screenshot and correspond to various
 
 The following annotated exploit code has more details.
 
-```Python
+```python
 import sys
 from pwn import *
 
@@ -146,7 +146,7 @@ Thus, we are allowed to call 1 arbitrary ROP gadget. Fortunately, I found that t
 encrypt(decrypt(payload)) == payload
 ```
 
-```Python
+```python
 import sys
 from pwn import *
 
@@ -200,7 +200,7 @@ This challenge was a very minimal binary with only 3 functions, `start`, `fn1` a
 
 To exploit this, we can use ROP to set the value of `rbp` to `0x402000`(address of the RWX .bss section), and jump to address `0x040105d` in the middle of `fn1`, which allows us to write into `0x402000` with any input. We can write our shellcode there, and allow the ropchain to bring us to `0x402000`, popping our shell to get the flag.
 
-```Python
+```python
 import sys
 from pwn import *
 

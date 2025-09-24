@@ -103,7 +103,7 @@ When the callee has finished execution. The function epilogue will proceed to in
 ## Challenge begins
 Now that the prerequisite knowledge for PowerPC has been covered. The exploitation of the challenge binary begins. Since this challenge was in PowerPC, I wanted to try out the decompiler of Ghidra, to see how well it can help me in this challenge. And I was pleasantly surprised by how helpful Ghidra was in this challenge. Here is the decompiled `main` of the challenge binary.
 
-```C
+```c
 void main(void)
 {
   size_t len;
@@ -130,7 +130,7 @@ void main(void)
 
 The `get_input()` function first reads 1000 bytes from the user into a global buffer `buf`. The amount of input we sent is determined using `strlen()`, and then our input is xor'd with the constant 0xcb. The bug of this challenge is found in the `encrypt` function that is later called.
 
-```C
+```c
 void .encrypt(char *_local_88,int __edflag)
 {
   undefined1 *puVar1;

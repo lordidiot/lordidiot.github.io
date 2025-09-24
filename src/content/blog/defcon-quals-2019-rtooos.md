@@ -52,7 +52,7 @@ Having done a few VM and hypervisor challenges in the past, this behaviour looks
 # Kernel-land
 
 The first thing we have to do is pwn the `crux` binary. We have to find some way to achieve shellcode execution, as our first goal is to read the hypervisor code, but the `cat` functionality provided prevents us from doing so.
-```C
+```c
 if ( !strncmp("cat ", cmd, v7) )
 {
 	if ( strlen(cmd) <= 4 )
@@ -129,7 +129,7 @@ hypervisor: Mach-O 64-bit x86_64 executable
 This is the executable format that MacOS uses, which is tragic since I run linux. Just like the kernel-land exploit, I'm going to have to exploit this without much debugging as I can only test the program through the remote server.
 
 There's a bunch of stuff going on in this binary, but it was getting very late into the night and I had school the next day, so I tried to reverse this as fast a possible. A good trick to use usually to pinpoint the areas to reverse is to just find important strings, then find the cross-references (xrefs) to them. This lands me in the `hypervise` function, which amongst other things handles the hypercalls I had mentioned earlier. Zooming straight into the hypercalls, you will notice that the hypervisor prevents you from reading any file with the string "flag" in it.
-```C
+```c
 case 0x66LL:
 filename = &vm_mem[_rax];
 if ( strcasestr(&vm_mem[_rax], "flag") )
@@ -145,7 +145,7 @@ else
 
 You will also notice that the `read` and `write` hypercalls are not implemented with adequate checking.
 
-```C
+```c
 case 0x63LL:
 	v9 = read(0, &vm_mem[_rax], _rsi);
 	hv_vcpu_write_register((unsigned int)vcpu, 2LL, v9);
@@ -157,7 +157,7 @@ case 0x64LL:
 
 These hypercalls do not perform bounds checking on the value of `rax`. This means that we have an Out-of-Bounds (OOB) read and write primitive! So how can we use this to read our flag? Using xrefs to find where `vm_mem` was initalised, you can see that is was allocated by `valloc`
 
-```C
+```c
 int map_memory()
 {
 	char *v0; // rax@1

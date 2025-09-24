@@ -45,7 +45,7 @@ Now that we have a heap leak, what can we do with this? The first thing we can r
 ## Arbitrary Free
 Although there aren't any bounds checking for the `free_wrapper`, we do not have a useable arbitrary free function yet as all the free calls are made as an offset from the base of the mmaped region.
 
-```C
+```c
 __int64 __fastcall free_wrapper(__int64 offset)
 {
   free((void *)(mmapped + offset));
@@ -69,7 +69,7 @@ Therefore, we can setup a fake chunk in our mmapped of the same size as heap_ptr
 ## Whoops tcache
 Early I mentioned that since I was unable to LD_PRELOAD the provided libc, I worked on the challenge using my default libc. However, since I use Ubuntu 16.04, the default libc I used was version 2.23. This mean that my libc does not support tcache while the provided libc (2.28) provides tcache! When performing heap exploits, something as a big as introducing tcache will likely break everything, and that's what happened when I tried the exploit on the remote server. Luckily, for this exploit, it is possible to negate the effects of tcache, essentially allowing us to pwn the binary like it's pre-tcache. My solution for this was to fill the tcache bins for the chunk sizes I used with 7(TCACHE_FILL_COUNT) chunks.
 
-```Python
+```python
 # fill up tcache fastbins
 for i in xrange(7+1):
 	write(0+i*0x20, p64(0)+p64(0x21))
