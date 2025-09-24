@@ -5,9 +5,11 @@ import '@fontsource-variable/lora';
 import '@fontsource-variable/reddit-mono';
 
 export interface Props {
-  title: string
+  title?: string
+  description?: string
 }
-const { title } = Astro.props;
+let { title, description } = Astro.props;
+title = title ? "Lord_Idiot | " + title : "Lord_Idiot";
 ---
 <!doctype html>
 <html lang="en">
@@ -15,6 +17,16 @@ const { title } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+    <meta>
+    <meta property="og:title" content={title}>
+    { description ? 
+      (<meta property="og:description" content={description} />)
+      : null
+    }
+    <meta property="og:url" content={ Astro.url.href }>
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Lord_Idiot's personal page">
+    <meta property="og:locale" content="en_US">
   </head>
   <body class="mb-18">
     <header class="middle-screen pt-5">

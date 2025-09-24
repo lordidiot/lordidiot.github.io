@@ -1,6 +1,7 @@
-# LordIdiot Blog
+# idiot.sg
 
-This repository contains the source for [Lord_Idiot](https://ctftime.org/team/58574)'s blog. The site is built with [Astro](https://astro.build) and hosts CTF writeups and other posts.
+Personal website and blog.
+The site is built with [Astro](https://astro.build).
 
 ## Development
 

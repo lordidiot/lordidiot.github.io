@@ -3,7 +3,7 @@ import Layout from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 const posts = await getCollection('blog');
 ---
-<Layout title="Blog">
+<Layout>
   <div class="middle-screen">
     <div class="mt-18">
       <h1 class="text-3xl font-medium">An idiot's personal blog</h1>
