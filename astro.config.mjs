@@ -5,7 +5,7 @@ import mdx from '@astrojs/mdx';
 import { oldBlogRedirects } from './redirects';
 
 export default defineConfig({
-  site: 'https://lordidiot.github.io',
+  site: 'https://idiot.sg',
 
   vite: {
     plugins: [tailwindcss()]
