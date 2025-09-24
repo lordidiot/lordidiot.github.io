@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
 import mdx from '@astrojs/mdx';
+import sitemap from "@astrojs/sitemap";
 import { oldBlogRedirects } from './redirects';
 import rehypeExternalLinks from 'rehype-external-links';
 
@@ -12,7 +13,7 @@ export default defineConfig({
     plugins: [tailwindcss()]
   },
 
-  integrations: [mdx()],
+  integrations: [mdx(), sitemap()],
 
   markdown: {
     shikiConfig: {
