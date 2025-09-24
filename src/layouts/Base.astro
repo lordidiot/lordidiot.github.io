@@ -7,8 +7,9 @@ import '@fontsource-variable/reddit-mono';
 export interface Props {
   title?: string
   description?: string
+  link?: string /* redirect to external page */
 }
-let { title, description } = Astro.props;
+let { title, description, link } = Astro.props;
 title = title ? "Lord_Idiot | " + title : "Lord_Idiot";
 ---
 <!doctype html>
@@ -16,6 +17,10 @@ title = title ? "Lord_Idiot | " + title : "Lord_Idiot";
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    { link ?
+      <meta http-equiv="refresh" content=`0; url=${link}` />
+      : null
+    }
     <title>{title}</title>
     <meta>
     <meta property="og:title" content={title}>
@@ -33,7 +38,7 @@ title = title ? "Lord_Idiot | " + title : "Lord_Idiot";
       <nav class="w-full flex flex-row justify-between text-2xl">
         <a href="/">idiot<span class="text-gray-500">.sg</span></a>
         <div class="flex flex-row gap-x-12">
-          <a href="/blog">posts<span class="text-gray-500">.</span></a>
+          <a href="/blog/page/1">posts<span class="text-gray-500">.</span></a>
         </div>
       </nav>
     </header>

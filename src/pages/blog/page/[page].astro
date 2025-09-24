@@ -21,7 +21,7 @@ const { page } = Astro.props as { page: Page<CollectionEntry<"blog">> };;
     </div>
     <div class="mt-12 flex flex-col gap-y-8 mb-12">
       { page.data.map(post => (
-        <a href={`/blog/${post.slug}/`}>
+        <a href={post.data.link ? post.data.link : `/blog/${post.slug}/`}>
           <div>
             <time datetime={post.data.pubDate.toISOString()}>
               {post.data.pubDate.toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric"})}

@@ -11,7 +11,7 @@ const { post } = Astro.props;
 const { Content } = await post.render();
 const { data } = post;
 ---
-<Layout title={data.title}>
+<Layout title={data.title} link={data.link}>
   <article class="blog-post">
     <div class="middle-screen my-12">
       <h1 class="text-3xl font-medium">{data.title}</h1>

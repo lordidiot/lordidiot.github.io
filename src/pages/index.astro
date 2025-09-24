@@ -16,7 +16,7 @@ const posts = await getCollection('blog');
           .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
           .slice(0, 5)
           .map(post => (
-          <a href={`/blog/${post.slug}/`}>
+          <a href={post.data.link ? post.data.link : `/blog/${post.slug}/`}>
             <div>
               <time datetime={post.data.pubDate.toISOString()}>
                 {post.data.pubDate.toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric"})}
@@ -27,7 +27,7 @@ const posts = await getCollection('blog');
           ))
         }
       </div>
-      <a href="/blog">... more posts</a>
+      <a href="/blog/page/1">... more posts</a>
     </div>
   </div>
 </Layout>
