@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
 import mdx from '@astrojs/mdx';
+import { oldBlogRedirects } from './redirects';
 
 export default defineConfig({
   site: 'https://lordidiot.github.io',
@@ -19,6 +20,7 @@ export default defineConfig({
   },
 
   redirects: {
-    "/blog": "/blog/page/1"
+    "/blog": "/blog/page/1",
+    ...oldBlogRedirects,
   },
 });
