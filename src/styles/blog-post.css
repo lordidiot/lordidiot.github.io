@@ -1,13 +1,50 @@
 @import "tailwindcss";
 
 .blog-post-body h1 {
-  @apply text-2xl;
+  @apply text-3xl;
+  @apply mt-4;
 }
 
 .blog-post-body h2 {
-  @apply text-xl;
+  @apply text-2xl;
+  @apply mt-4;
 }
 
 .blog-post-body h3 {
-  @apply text-lg;
+  @apply text-xl;
+  @apply mt-3;
+}
+
+.blog-post-body ol {
+  @apply list-decimal;
+  @apply pl-5;
+}
+
+.blog-post-body ul {
+  @apply list-disc;
+  @apply pl-4;
+}
+
+.blog-post-body strong {
+  font-weight: 550;
+}
+
+.blog-post-body blockquote {
+  @apply border-l-4;
+  @apply border-gray-200;
+  @apply py-2;
+  @apply px-3;
+}
+
+/* Inline code */
+.blog-post-body p > code, li > code, span > code {
+  @apply text-red-700;
+  @apply bg-gray-100;
+  @apply px-1.5;
+  @apply py-0.5;
+  @apply rounded-sm;
+}
+
+.blog-post-body a {
+  @apply text-blue-700;
 }

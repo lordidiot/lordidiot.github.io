@@ -15,9 +15,9 @@ const { data } = post;
   <article class="blog-post">
     <div class="middle-screen my-12">
       <h1 class="text-3xl font-medium">{data.title}</h1>
-      <time datetime={data.pubDate.toISOString()}>{data.pubDate.toDateString()}</time>
+      <time datetime={data.pubDate.toISOString()}>{data.pubDate.toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric"})}</time>
     </div>
-    <div class="blog-post-body middle-screen">
+    <div class="blog-post-body middle-screen flex flex-col gap-y-5">
       <Content />
     </div>
   </article>

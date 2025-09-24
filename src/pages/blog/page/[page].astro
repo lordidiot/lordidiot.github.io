@@ -1,0 +1,49 @@
+---
+import Layout from '../../../layouts/Base.astro';
+import type { GetStaticPaths, Page } from "astro";
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+
+export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
+  const posts = (await getCollection('blog'))
+    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  return paginate(posts, { pageSize: 8 });
+};
+
+const { page } = Astro.props as { page: Page<CollectionEntry<"blog">> };;
+---
+<Layout title="Blog posts">
+  <div class="middle-screen">
+    <div class="mt-18">
+      <a href="/blog/page/1">
+        <h1 class="text-3xl font-medium">Blog posts</h1>
+      </a>
+    </div>
+    <div class="mt-12 flex flex-col gap-y-8 mb-12">
+      { page.data.map(post => (
+        <a href={`/blog/${post.slug}/`}>
+          <div>
+            <time datetime={post.data.pubDate.toISOString()}>
+              {post.data.pubDate.toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric"})}
+            </time>
+            <h2 class="text-2xl">{post.data.title}</h2>
+          </div>
+        </a>
+      ))}
+    </div>
+    <div class="mt-12 flex flex-row justify-between">
+      <div class="w-1/2">
+        { page.url.prev ? 
+          (<a href={page.url.prev}>previous</a>)
+          : null
+        }
+      </div>
+      <div class="w-1/2 flex flex-row justify-end">
+        { page.url.next ? 
+          (<a href={page.url.next}>next</a>)
+          : null
+        }
+      </div>
+    </div>
+  </div>
+</Layout>
