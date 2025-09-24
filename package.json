@@ -1,0 +1,18 @@
+{
+  "name": "lordidiot-blog",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.6",
+    "@fontsource-variable/lora": "^5.2.8",
+    "@fontsource-variable/reddit-mono": "^5.2.8",
+    "@tailwindcss/vite": "^4.1.13",
+    "astro": "^5.13.8",
+    "tailwindcss": "^4.1.13"
+  }
+}

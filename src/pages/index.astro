@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+const posts = await getCollection('blog');
+---
+<Layout title="Blog">
+  <div class="middle-screen">
+    <div class="mt-18">
+      <h1 class="text-3xl font-medium">An idiot's personal blog</h1>
+      <p>Writing about AI, software, security and anything else that interests me.</p>
+    </div>
+    <div class="mt-12">
+      <h2 class="text-3xl font-medium">Latest</h2>
+      <div class="flex flex-col gap-y-8 mt-5 mb-12">
+        {posts
+          .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+          .slice(0, 5)
+          .map(post => (
+          <a href={`/blog/${post.slug}/`}>
+            <div>
+              <time datetime={post.data.pubDate.toISOString()}>
+                {post.data.pubDate.toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric"})}
+              </time>
+              <h2 class="text-2xl">{post.data.title}</h2>
+            </div>
+          </a>
+          ))
+        }
+      </div>
+      <a href="/blog">... more posts</a>
+    </div>
+  </div>
+</Layout>

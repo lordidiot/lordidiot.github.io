@@ -1,0 +1,32 @@
+---
+import '../styles/global.css'
+import '../styles/blog-post.css'
+import '@fontsource-variable/lora';
+import '@fontsource-variable/reddit-mono';
+
+export interface Props {
+  title: string
+}
+const { title } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+  </head>
+  <body class="mb-18">
+    <header class="middle-screen pt-5">
+      <nav class="w-full flex flex-row justify-between text-2xl">
+        <a href="/">idiot<span class="text-gray-500">.sg</span></a>
+        <div class="flex flex-row gap-x-12">
+          <a href="/blog">posts<span class="text-gray-500">.</span></a>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

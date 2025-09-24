@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+
+* {
+  font-family: 'Lora Variable', serif;
+
+  /* https://forum.figma.com/ask-the-community-7/font-in-browser-seem-bolder-than-in-the-figma-8146 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: never;
+}
+
+pre, code {
+  font-family: 'Reddit Mono Variable', monospace;
+  @apply text-sm;
+}
+
+pre *, code * {
+  font-family: inherit !important;
+}
+
+pre {
+  @apply py-4;
+  @apply my-4;
+  @apply px-4;
+  @apply border;
+  @apply border-gray-300;
+  @apply bg-gray-100;
+  @apply border-dashed;
+  @apply rounded-xl;
+}
+
+body {
+  width: 100%;
+  min-height: 1vh;
+}
+
+.middle-screen {
+  @apply max-w-4xl;
+  @apply mx-auto;
+  @apply px-12;
+}
