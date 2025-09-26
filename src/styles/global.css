@@ -38,5 +38,6 @@ body {
 .middle-screen {
   @apply max-w-4xl;
   @apply mx-auto;
-  @apply px-12;
+  @apply px-5;
+  @apply sm:px-12;
 }
