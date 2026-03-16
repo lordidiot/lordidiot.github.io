@@ -5,7 +5,7 @@ export async function GET(context) {
   const blog = await getCollection('blog');
   return rss({
     // `<title>` field in output xml
-    title: 'Lord_Idiot\'s personal page',
+    title: 'Diary of a reserve engineer',
     // `<description>` field in output xml
     description: 'Writing about AI, software, security and anything else that interests me.',
     // Pull in your project "site" from the endpoint context
