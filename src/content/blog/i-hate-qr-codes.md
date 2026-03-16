@@ -3,6 +3,7 @@ title: "I hate QR codes"
 description: ""
 pubDate: 2026-03-16
 tags: [random]
+ogImage: /images/i-hate-qr-codes/evil-poster.jpeg
 ---
 
 I haven't been writing much lately since nothing felt interesting enough to write about, but today I decided to rant about something on my mind.

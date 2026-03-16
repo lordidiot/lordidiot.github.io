@@ -8,9 +8,11 @@ export interface Props {
   title?: string
   description?: string
   link?: string /* redirect to external page */
+  ogImage?: string
 }
-let { title, description, link } = Astro.props;
+let { title, description, link, ogImage } = Astro.props;
 title = title ? "Lord_Idiot | " + title : "Lord_Idiot";
+const ogImageUrl = ogImage ? new URL(ogImage, Astro.site ?? Astro.url).href : undefined;
 ---
 <!doctype html>
 <html lang="en">
@@ -26,6 +28,10 @@ title = title ? "Lord_Idiot | " + title : "Lord_Idiot";
     <meta property="og:title" content={title}>
     { description ?
       (<meta property="og:description" content={description} />)
+      : null
+    }
+    { ogImageUrl ?
+      (<meta property="og:image" content={ogImageUrl} />)
       : null
     }
     <meta property="og:url" content={ Astro.url.href }>
