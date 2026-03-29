@@ -48,3 +48,13 @@
 .blog-post-body a {
   @apply text-blue-700;
 }
+
+.comments-section {
+  @apply border-t;
+  @apply border-gray-200;
+  @apply pt-10;
+}
+
+.comments-widget {
+  min-height: 12rem;
+}

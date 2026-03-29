@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Base.astro';
+import Comments from '../../components/Comments.astro';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -26,4 +27,5 @@ const { data } = post;
       <Content />
     </div>
   </article>
+  {!data.link && <Comments repo="lordidiot/lordidiot.github.io" />}
 </Layout>

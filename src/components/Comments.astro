@@ -1,0 +1,43 @@
+---
+interface Props {
+  repo: string;
+  theme?: string;
+  issueTerm?: 'pathname' | 'title' | 'url' | 'og:title';
+  label?: string;
+}
+
+const {
+  repo,
+  theme = 'github-light',
+  issueTerm = 'pathname',
+  label,
+} = Astro.props;
+---
+
+<section class="comments-section middle-screen mt-16 mb-20">
+  <h2 class="text-2xl font-medium">Comments</h2>
+  <p class="mt-2 text-sm text-gray-600">
+    Sign in with GitHub to join the discussion. Powered by utterances.
+  </p>
+  <div class="comments-widget mt-6">
+    <script is:inline define:vars={{ repo, theme, issueTerm, label }}>
+      const mount = document.currentScript?.parentElement;
+
+      if (mount) {
+        const utterances = document.createElement('script');
+        utterances.src = 'https://utteranc.es/client.js';
+        utterances.async = true;
+        utterances.crossOrigin = 'anonymous';
+        utterances.setAttribute('repo', repo);
+        utterances.setAttribute('issue-term', issueTerm);
+        utterances.setAttribute('theme', theme);
+
+        if (label) {
+          utterances.setAttribute('label', label);
+        }
+
+        mount.appendChild(utterances);
+      }
+    </script>
+  </div>
+</section>
