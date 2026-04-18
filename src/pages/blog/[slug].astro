@@ -9,8 +9,9 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await post.render();
+const { Content, headings } = await post.render();
 const { data } = post;
+const tableOfContents = headings.filter(({ depth }) => depth === 2 || depth === 3);
 ---
 <Layout
   title={data.title}
@@ -23,8 +24,32 @@ const { data } = post;
       <h1 class="text-3xl font-medium">{data.title}</h1>
       <time datetime={data.pubDate.toISOString()}>{data.pubDate.toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric"})}</time>
     </div>
-    <div class="blog-post-body middle-screen flex flex-col gap-y-5">
-      <Content />
+    <div class="relative flex flex-col gap-8 middle-screen min-[1536px]:block">
+      {tableOfContents.length > 1 && (
+        <aside
+          class="order-first min-[1536px]:absolute min-[1536px]:top-0 min-[1536px]:right-[calc(100%+2.75rem)] min-[1536px]:w-56"
+          aria-label="Table of contents"
+        >
+          <div class="border-y border-gray-200 py-4 min-[1536px]:sticky min-[1536px]:top-6 min-[1536px]:border-y-0 min-[1536px]:border-r min-[1536px]:py-0 min-[1536px]:pr-4">
+            <p class="mb-3 text-xs uppercase tracking-[0.2em] text-gray-500">Contents</p>
+            <ul class="m-0 space-y-2 p-0">
+              {tableOfContents.map((heading) => (
+                <li
+                  class:list={[
+                    'list-none text-sm leading-6 text-gray-600',
+                    heading.depth === 3 && 'pl-4 text-gray-500'
+                  ]}
+                >
+                  <a class="text-inherit no-underline transition-colors duration-150 hover:text-black" href={`#${heading.slug}`}>{heading.text}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </aside>
+      )}
+      <div class="blog-post-body min-w-0 flex flex-col gap-y-5">
+        <Content />
+      </div>
     </div>
   </article>
   {!data.link && <Comments repo="lordidiot/lordidiot.github.io" />}

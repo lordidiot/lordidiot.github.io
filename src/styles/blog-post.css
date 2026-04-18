@@ -3,16 +3,19 @@
 .blog-post-body h1 {
   @apply text-3xl;
   @apply mt-4;
+  scroll-margin-top: 1.5rem;
 }
 
 .blog-post-body h2 {
   @apply text-2xl;
   @apply mt-4;
+  scroll-margin-top: 1.5rem;
 }
 
 .blog-post-body h3 {
   @apply text-xl;
   @apply mt-3;
+  scroll-margin-top: 1.5rem;
 }
 
 .blog-post-body ol {
