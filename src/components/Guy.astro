@@ -1,19 +1,29 @@
 <figure class="guy" role="img" aria-label="Illustrated portrait">
   <img class="guy__layer" src="/assets/images/body.png" width="660" height="647" alt="" />
   <img
-    class="guy__layer guy__look-layer guy__left-eye"
+    class="guy__layer guy__look-layer guy__eye guy__eye--normal guy__left-eye"
     src="/assets/images/left_eye.png"
-    data-normal-src="/assets/images/left_eye.png"
-    data-squint-src="/assets/images/left_squint.png"
     width="660"
     height="647"
     alt=""
   />
   <img
-    class="guy__layer guy__look-layer guy__right-eye"
+    class="guy__layer guy__look-layer guy__eye guy__eye--normal guy__right-eye"
     src="/assets/images/right_eye.png"
-    data-normal-src="/assets/images/right_eye.png"
-    data-squint-src="/assets/images/right_squint.png"
+    width="660"
+    height="647"
+    alt=""
+  />
+  <img
+    class="guy__layer guy__look-layer guy__eye guy__eye--squint guy__left-eye"
+    src="/assets/images/left_squint.png"
+    width="660"
+    height="647"
+    alt=""
+  />
+  <img
+    class="guy__layer guy__look-layer guy__eye guy__eye--squint guy__right-eye"
+    src="/assets/images/right_squint.png"
     width="660"
     height="647"
     alt=""
@@ -32,14 +42,6 @@
   const guys = document.querySelectorAll<HTMLElement>('.guy');
 
   const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
-
-  const setSquinting = (isSquinting: boolean) => {
-    guys.forEach((guy) => {
-      guy.querySelectorAll<HTMLImageElement>('[data-normal-src][data-squint-src]').forEach((eye) => {
-        eye.src = isSquinting ? eye.dataset.squintSrc! : eye.dataset.normalSrc!;
-      });
-    });
-  };
 
   const updateLook = (cursorX: number, cursorY: number) => {
     guys.forEach((guy) => {
@@ -93,18 +95,6 @@
     updateLook(event.clientX, event.clientY);
   });
 
-  window.addEventListener('mousedown', () => {
-    setSquinting(true);
-  });
-
-  window.addEventListener('mouseup', () => {
-    setSquinting(false);
-  });
-
-  window.addEventListener('blur', () => {
-    setSquinting(false);
-  });
-
   document.addEventListener('pointerleave', () => {
     guys.forEach((guy) => {
       guy.style.setProperty('--guy-look-x', '0px');
@@ -112,7 +102,6 @@
       guy.style.setProperty('--guy-eye-converge-x', '0px');
       guy.style.setProperty('--guy-right-brow-raise-y', '0px');
     });
-    setSquinting(false);
   });
 </script>
 
@@ -146,8 +135,13 @@
     width: 120px;
     aspect-ratio: 660 / 647;
     margin: 0;
+    cursor: grab;
     user-select: none;
     -webkit-user-select: none;
+  }
+
+  .guy:active {
+    cursor: grabbing;
   }
 
   .guy__layer {
@@ -175,6 +169,24 @@
 
   .guy__right-eye {
     transform: translate(calc(var(--guy-look-x) - var(--guy-eye-converge-x)), var(--guy-look-y));
+  }
+
+  .guy__eye {
+    transition:
+      opacity 60ms linear,
+      transform 120ms ease-out;
+  }
+
+  .guy__eye--squint {
+    opacity: 0;
+  }
+
+  .guy:active .guy__eye--normal {
+    opacity: 0;
+  }
+
+  .guy:active .guy__eye--squint {
+    opacity: 1;
   }
 
   .guy__right-eyebrow {
