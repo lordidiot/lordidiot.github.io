@@ -79,5 +79,5 @@ After this we get a shell! The flag is now ours!
 
 `WhiteHat{aeb7656b7a397a01c0d9d19fba3a81352e9b21aa}`
 
-[giftshop]: /ctf/2018-08-19-whitegp-pwn01/giftshop
-[exploit]: /ctf/2018-08-19-whitegp-pwn01/exploit.py
+[giftshop]: /ctf/2018-08-19-whitehatgp-pwn01/giftshop
+[exploit]: /ctf/2018-08-19-whitehatgp-pwn01/exploit.py
