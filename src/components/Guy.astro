@@ -1,0 +1,142 @@
+<figure class="guy" role="img" aria-label="Illustrated portrait">
+  <img class="guy__layer" src="/assets/images/body.png" width="660" height="647" alt="" />
+  <img class="guy__layer guy__look-layer guy__left-eye" src="/assets/images/eyes.png" width="660" height="647" alt="" />
+  <img class="guy__layer guy__look-layer guy__right-eye" src="/assets/images/eyes.png" width="660" height="647" alt="" />
+  <img class="guy__layer guy__look-layer" src="/assets/images/left_eyebrow.png" width="660" height="647" alt="" />
+  <img
+    class="guy__layer guy__look-layer guy__right-eyebrow"
+    src="/assets/images/right_eyebrow.png"
+    width="660"
+    height="647"
+    alt=""
+  />
+</figure>
+
+<script>
+  const guys = document.querySelectorAll<HTMLElement>('.guy');
+
+  const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+
+  const updateLook = (cursorX: number, cursorY: number) => {
+    guys.forEach((guy) => {
+      const bounds = guy.getBoundingClientRect();
+      const centerX = bounds.left + bounds.width / 2;
+      const centerY = bounds.top + bounds.height / 2;
+      const cursorOffsetX = cursorX - centerX;
+      const cursorOffsetY = cursorY - centerY;
+      const distanceFromGuy = Math.hypot(cursorOffsetX, cursorOffsetY);
+      const styles = getComputedStyle(guy);
+      const maxXRatio = Number.parseFloat(styles.getPropertyValue('--guy-look-max-x'));
+      const maxYRatio = Number.parseFloat(styles.getPropertyValue('--guy-look-max-y'));
+      const radiusRatio = Number.parseFloat(styles.getPropertyValue('--guy-look-radius'));
+      const eyeConvergeMaxRatio = Number.parseFloat(styles.getPropertyValue('--guy-eye-converge-max'));
+      const eyeConvergeStartRatio = Number.parseFloat(styles.getPropertyValue('--guy-eye-converge-start'));
+      const eyeConvergeFullRatio = Number.parseFloat(styles.getPropertyValue('--guy-eye-converge-full'));
+      const rightBrowRaiseMaxRatio = Number.parseFloat(styles.getPropertyValue('--guy-right-brow-raise-max'));
+      const rightBrowRaiseStartRatio = Number.parseFloat(styles.getPropertyValue('--guy-right-brow-raise-start'));
+      const rightBrowRaiseFullRatio = Number.parseFloat(styles.getPropertyValue('--guy-right-brow-raise-full'));
+      const guySize = Math.max(bounds.width, bounds.height);
+      const maxX = bounds.width * maxXRatio;
+      const maxY = bounds.height * maxYRatio;
+      const radius = guySize * radiusRatio;
+      const offsetX = clamp(cursorOffsetX / radius, -1, 1) * maxX;
+      const offsetY = clamp(cursorOffsetY / radius, -1, 1) * maxY;
+      const eyeConvergeStart = guySize * eyeConvergeStartRatio;
+      const eyeConvergeFull = guySize * eyeConvergeFullRatio;
+      const eyeConvergeProgress = clamp(
+        (eyeConvergeStart - distanceFromGuy) / (eyeConvergeStart - eyeConvergeFull),
+        0,
+        1,
+      );
+      const eyeConverge = bounds.width * eyeConvergeMaxRatio * eyeConvergeProgress;
+      const rightBrowRaiseStart = guySize * rightBrowRaiseStartRatio;
+      const rightBrowRaiseFull = guySize * rightBrowRaiseFullRatio;
+      const rightBrowRaiseProgress = clamp(
+        (rightBrowRaiseStart - distanceFromGuy) / (rightBrowRaiseStart - rightBrowRaiseFull),
+        0,
+        1,
+      );
+      const rightBrowRaise = guySize * rightBrowRaiseMaxRatio * rightBrowRaiseProgress;
+
+      guy.style.setProperty('--guy-look-x', `${offsetX}px`);
+      guy.style.setProperty('--guy-look-y', `${offsetY}px`);
+      guy.style.setProperty('--guy-eye-converge-x', `${eyeConverge}px`);
+      guy.style.setProperty('--guy-right-brow-raise-y', `${rightBrowRaise}px`);
+    });
+  };
+
+  window.addEventListener('pointermove', (event) => {
+    updateLook(event.clientX, event.clientY);
+  });
+
+  document.addEventListener('pointerleave', () => {
+    guys.forEach((guy) => {
+      guy.style.setProperty('--guy-look-x', '0px');
+      guy.style.setProperty('--guy-look-y', '0px');
+      guy.style.setProperty('--guy-eye-converge-x', '0px');
+      guy.style.setProperty('--guy-right-brow-raise-y', '0px');
+    });
+  });
+</script>
+
+<style>
+  .guy {
+    --guy-look-x: 0px;
+    --guy-look-y: 0px;
+    --guy-eye-converge-x: 0px;
+    --guy-right-brow-raise-y: 0px;
+    /* Max horizontal offset as a fraction of the guy's rendered width. */
+    --guy-look-max-x: 0.06;
+    /* Max vertical offset as a fraction of the guy's rendered height. */
+    --guy-look-max-y: 0.04;
+    /* Cursor distance, as a fraction of guy size, needed to reach max offset. */
+    --guy-look-radius: 0.9;
+    /* Max inward movement per eye as a fraction of the guy's rendered width. */
+    --guy-eye-converge-max: 0.035;
+    /* Cursor distance, as a fraction of guy size, where eye convergence starts. */
+    --guy-eye-converge-start: 1.0;
+    /* Cursor distance, as a fraction of guy size, where eye convergence reaches max. */
+    --guy-eye-converge-full: 0.25;
+    /* Max right eyebrow lift as a fraction of guy size. */
+    --guy-right-brow-raise-max: 0.05;
+    /* Cursor distance, as a fraction of guy size, where right eyebrow starts lifting. */
+    --guy-right-brow-raise-start: 1.2;
+    /* Cursor distance, as a fraction of guy size, where right eyebrow reaches max lift. */
+    --guy-right-brow-raise-full: 0.25;
+
+    position: relative;
+    flex: 0 0 auto;
+    width: 120px;
+    aspect-ratio: 660 / 647;
+    margin: 0;
+  }
+
+  .guy__layer {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .guy__look-layer {
+    transform: translate(var(--guy-look-x), var(--guy-look-y));
+    transition: transform 120ms ease-out;
+    will-change: transform;
+  }
+
+  .guy__left-eye {
+    clip-path: inset(0 50% 0 0);
+    transform: translate(calc(var(--guy-look-x) + var(--guy-eye-converge-x)), var(--guy-look-y));
+  }
+
+  .guy__right-eye {
+    clip-path: inset(0 0 0 50%);
+    transform: translate(calc(var(--guy-look-x) - var(--guy-eye-converge-x)), var(--guy-look-y));
+  }
+
+  .guy__right-eyebrow {
+    transform: translate(var(--guy-look-x), calc(var(--guy-look-y) - var(--guy-right-brow-raise-y)));
+  }
+</style>

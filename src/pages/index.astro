@@ -1,13 +1,17 @@
 ---
 import Layout from '../layouts/Base.astro';
+import Guy from '../components/Guy.astro';
 import { getCollection } from 'astro:content';
 const posts = await getCollection('blog');
 ---
 <Layout>
   <div class="middle-screen">
-    <div class="mt-18">
-      <h1 class="text-3xl font-medium">Diary of a <i>reserve</i> engineer</h1>
-      <p>Writing about AI, software, security and anything else that interests me.</p>
+    <div class="mt-18 flex flex-row gap-x-8 items-center">
+      <Guy />
+      <div>
+        <h1 class="text-3xl font-medium">Diary of a <i>reserve</i> engineer</h1>
+        <p>Writing about AI, software, security and anything else that interests me.</p>
+      </div>
     </div>
     <div class="mt-12">
       <h2 class="text-3xl font-medium">Latest</h2>
@@ -27,7 +31,7 @@ const posts = await getCollection('blog');
           ))
         }
       </div>
-      <a href="/blog/page/1#post_4" class="pr-24 py-4">... more posts</a>
+      <a href="/blog/page/1#post_6" class="pr-24 py-4">... more posts</a>
     </div>
   </div>
 </Layout>
